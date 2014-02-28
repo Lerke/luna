@@ -58,7 +58,7 @@ $(document).ready(function() {
 		var strName = $("#streamname").val().toString();
 		strName = strName.replace(/[^a-z0-9]/gi,'')
 		console.log(strName);
-		$("#feedbackText").html("This name is available!<br> Your URL: " + SERVER + "/streams/" + strName);
+		$("#feedbackText").html("This name is available!<br> Your URL: " + window.location.hostname + "/streams/" + strName);
 
 		//Replace button.
 		$("#streamConfirm").unbind("click");;
