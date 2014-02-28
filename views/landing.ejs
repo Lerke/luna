@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Luna</title>
+
+	<link rel="stylesheet" href="/css/lunastyle.css">
+	<link href='http://fonts.googleapis.c
+	om/css?family=Alegreya+Sans+SC:100' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/css/lunaMainPage.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="/js/jquery.fittext.js"></script>
+	<script src="/js/generalPageRender.js"></script>
+
+
+	<!-- LUNA sources. -->
+	<script src="/js/lunaMainPage.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<!-- End LUNA sources. -->
+
+</head>
+<body>
+	<div id="pageContainer">
+		<div id="lunaSidebar-NM">
+			<span id="lunaText">LUNA</span>
+			<div id="lunaLogo">
+			</div>
+
+		</div>
+		<div id="lunaContent">
+		<div id="lunaC"><span id="creditsSpan"><a href="../credits">&copy;</a></span></div>
+			<div id="lunaBGLogo">
+			</div>
+			<span id="lunaBlurb">
+				Luna lets you create synchronized video streams without needing an account. Create a stream right away!
+			</span>
+			<div id="createStream">CREATE STREAM</div>
+		</div>
+
+		<div id="createStreamPage">
+			<div id="lunaBGLogo">
+			</div>
+			<span id="createStreamBlurb">
+				Stream name<br>
+				<input type="text" id="streamname" class="inputText"/>
+			</span>
+			<span id="feedbackText" class="errorText"></span>
+			<div id="streamConfirm">CHECK NAME</div>
+			<div id="createStreamBtn">CREATE STREAM</div>
+			<div id="gotoStreamBtn">GO TO STREAM</div>
+
+		</div>
+
+	</div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+body {
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	background-color: #070317;
+	overflow-x:hidden;
+
+}
+#pageContainer {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	background-color: #070317;
+	position: absolute;
+}
+#lunaSidebar, #lunaSidebar-NM {
+	height: 100%;
+	width: 188px;
+	background-color: #6265b9;
+	position: absolute;
+	-webkit-box-shadow: inset 0px 0px 16px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 0px 0px 16px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 0px 0px 16px 0px rgba(0,0,0,0.75);
+	left:0;
+	top:0;
+	min-height: 100%;
+	margin-top: 0;
+	overflow: hidden;
+	bottom:0;
+}
+
+#lunaContent {
+	position: absolute;
+	left: 188px;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+}
+
+
+#lunaCredits {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+}
+
+#version {
+	display: block;
+	color: #bccdd8;
+	font-family: 'Alegreya Sans SC', sans-serif;
+	font-weight: 100;
+	font-size: 4em;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	text-align: center;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-shadow: #ecf1f4 0 0 15px;
+}
+
+
+#lunaText {
+	position:absolute;
+	height:auto;
+	width:inherit;
+	color: #bccdd8;
+	font-family: 'Alegreya Sans SC', sans-serif;
+	font-weight: 100;
+}
+
+#lunaCreditsBlurb {
+	padding-top: 100px;
+	display: block;
+	color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 1em;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-shadow: #ecf1f4 0 0 15px;
+	padding-bottom: 40px;
+}
+
+#lunaCreditsBlurb a {
+		text-shadow: #ecf1f4 0 0 15px;
+			color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+}
+
+#lunaCreditsBlurb hr {
+	border: 0;
+	height: 0;
+	width: 100%;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+
+#lunaLogo {
+	width: 143px;
+	height: 143px;
+	z-index: 50;
+	background-image: url(../img/luqt.png);
+	top:20px;
+	margin: 0 auto;
+	margin-top: 25px;
+}
+
+
+#lunaBGLogo {
+	position: absolute;
+	height: 368px;
+	width: 368px;
+	left: 0;
+	top:250px;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	background-image: url(../img/lunahalfmoon.png);
+	background-repeat: no-repeat;
+}
+
+#videoPlayer {
+	width: 300px;
+	height: 300px;
+}
+

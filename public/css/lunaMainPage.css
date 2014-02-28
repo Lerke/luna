@@ -1,0 +1,226 @@
+#lunaBlurb {
+	padding-top: 200px;
+	display: block;
+	color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-shadow: #ecf1f4 0 0 15px;
+	padding-bottom: 40px;
+	
+}
+
+#createStream {
+	margin-top: 50px;
+	display: block;
+	background-color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:450px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-align: center;
+	text-shadow: #ecf1f4 0 0 15px;
+	transition: box-shadow .6s;
+	transition: -moz-box-shadow .6s;
+	transition: -webkit-box-shadow: .6s;
+}
+
+#createStream:hover {
+	-moz-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	-webkit-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	box-shadow: 0 0 20px rgba(236,241,244,0.7);
+}
+
+#createStreamPage {
+	display:none;
+
+	position: absolute;
+	left: 188px;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	height: 100%;
+}
+
+#createStreamBlurb {
+	padding-top: 200px;
+	display: block;
+	color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-shadow: #ecf1f4 0 0 15px;
+	padding-bottom: 20px;
+}
+
+.inputText {
+	background-color: transparent;
+	border: 1px solid rgba(188,205,216,0.5);
+	width:100%;
+	height:60px;
+	color: #bccdd8;
+	font-size: 52px;
+	border-radius: 10px;
+	text-align: center;
+	font-family: 'Open Sans', sans-serif;
+	line-height: 60px;
+	transition: box-shadow .5s;
+}
+
+.inputText:focus {
+	outline: none;
+	border-color: rgba(188,205,216,0.5);
+	box-shadow: 0 0 10px #ecf1f4;
+}
+
+#streamConfirm {
+	margin-top: 50px;
+	display: block;
+	background-color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:450px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-align: center;
+	text-shadow: #ecf1f4 0 0 15px;
+	transition: box-shadow .6s;
+	transition: -moz-box-shadow .6s;
+	transition: -webkit-box-shadow: .6s;
+}
+
+#streamConfirm:hover {
+	-moz-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	-webkit-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	box-shadow: 0 0 20px rgba(236,241,244,0.7);
+}
+
+#createStreamBtn {
+	margin-top: 50px;
+	display: block;
+	background-color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:450px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-align: center;
+	text-shadow: #ecf1f4 0 0 15px;
+	transition: box-shadow .6s;
+	transition: -moz-box-shadow .6s;
+	transition: -webkit-box-shadow: .6s;
+}
+
+#createStreamBtn:hover {
+	-moz-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	-webkit-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	box-shadow: 0 0 20px rgba(236,241,244,0.7);
+}
+
+#gotoStreamBtn {
+	margin-top: 50px;
+	display: block;
+	background-color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 3em;
+	max-width:450px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	text-align: center;
+	text-shadow: #ecf1f4 0 0 15px;
+	transition: box-shadow .6s;
+	transition: -moz-box-shadow .6s;
+	transition: -webkit-box-shadow: .6s;
+}
+
+#gotoStreamBtn:hover {
+	-moz-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	-webkit-box-shadow: 0 0 20px rgba(236,241,244,0.7);
+	box-shadow: 0 0 20px rgba(236,241,244,0.7);
+}
+
+.errorText {
+	visibility:hidden;
+	color: #ffcdcd;
+	font-size: 1.5em;
+	display: block;
+	color: #ffcdcd;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	margin-top: -20px;
+	padding-bottom: 20px;
+	
+}
+
+.goodtogoText {
+	visibility:hidden;
+	font-size: 1.5em;
+	display: block;
+	color: #cdffe2;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	max-width:800px;
+	position: relative;
+	margin: 0 auto;
+	word-wrap: break-word;
+	word-break: break-word;
+	margin-top: -20px;
+	padding-bottom: 20px;
+}
+
+.goodtogoInput {
+	background-color: rgba(205,255,256, 0.5);
+}
+
+#creditsSpan {
+	font-size: 5em;
+	font-family: 'Open Sans', sans-serif;
+	color: rgba(188,205,216,0.5);
+}
+
+
+#lunaC {
+	position: absolute;
+	right: 20px;
+	bottom: 0px;
+	display: block;
+}
+
+#lunaC a {
+	color: rgba(188,205,216,0.4);
+	font-family: 'Open Sans', sans-serif;
+	text-decoration: none;
+	transition: color 1s;
+}
+
+#lunaC a:hover {
+	color: rgba(188,205,216,1);;
+}
