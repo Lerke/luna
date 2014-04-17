@@ -290,7 +290,7 @@ app.get('/streams/:stream', function(request, response) {
 							//Check SoundCloud.
 							/*if(userData.url.indexOf("soundcloud.com") > -1) {
 								addSoundcloudTrack(userData.url, userData.myroom);
-							*/}
+							}*/
 						}
 					});
 
