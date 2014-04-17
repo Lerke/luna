@@ -1,0 +1,12 @@
+#infotable {
+margin-top: 100px;
+	color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	text-shadow: #ecf1f4 0 0 15px;
+	padding-bottom: 40px;
+	border: 1px solid #ecf1f4;
+}

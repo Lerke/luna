@@ -9,22 +9,24 @@
 	om/css?family=Alegreya+Sans+SC:100,300' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/css/lunaMainPage.css">
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
-	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-	<script src="/js/jquery.fittext.js"></script>
-	<script src="/js/generalPageRender.js"></script>
-
-	<!-- Note: LUNA includes these libraries, incase the original server goes down! -->
-	<link href="//vjs.zencdn.net/4.3/video-js.css" rel="stylesheet">
-	<script src="//vjs.zencdn.net/4.3/video.js"></script>
-	<script src="/js/vjs.youtube.js"></script>
 
 	<link rel="stylesheet" href="/css/lunaStream.css">
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+
+	<!-- Note: LUNA includes these libraries, incase the original server goes down! -->
+	<script src="//vjs.zencdn.net/4.3/video.js"></script>
+	<link href="//vjs.zencdn.net/4.3/video-js.css" rel="stylesheet">
+	<script src="/js/vjs.youtube.js"></script>
 
 	<!-- LUNA sources. -->
 	<script src="/js/client.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="/js/jquery.fittext.js"></script>
+	<script src="/js/generalPageRender.js"></script>
 	<!-- End LUNA sources. -->
 	
 </head>
@@ -34,24 +36,25 @@
 			<span id="lunaText">LUNA</span>
 			<div id="lunaLogo">
 			</div>
+			<button id="testbtn">Test</button>
 			<select multiple id="playlistSelect">
 			</select>
 			<div id="controlDiv">
-			<span id="controlspan">Control Panel</span><hr>
+				<span id="controlspan">Control Panel</span><hr>
 
-			
-			<input type="checkbox" name="shuffle" id="shuffleBox"><label for="shuffleBox">Shuffle</label><br>
-			<div id="nextPrevBox">
-				<button id="prevbutton"></button>
-				<button id="nextbutton"></button>
-			</div>
-			<button id="playbutton" class="cdivButton">PLAY</button>
-			<button id="removebutton" class="cdivButton">REMOVE</button>
-			<button id="renamebutton" class="cdivButton">RENAME</button>
-			<div id="addVideoBox">
+
+				<input type="checkbox" name="shuffle" id="shuffleBox"><label for="shuffleBox">Shuffle</label><br>
+				<div id="nextPrevBox">
+					<button id="prevbutton"></button>
+					<button id="nextbutton"></button>
+				</div>
+				<button id="playbutton" class="cdivButton">PLAY</button>
+				<button id="removebutton" class="cdivButton">REMOVE</button>
+				<button id="renamebutton" class="cdivButton">RENAME</button>
+				<div id="addVideoBox">
 					<span id="addVideoText">Add Video</span>
-				<input type="text" id="urlInput" placeholder="YT URL"/></div>
-			</div>
+					<input type="text" id="urlInput" placeholder="YT URL"/></div>
+				</div>
 			</div>
 		</div>
 
@@ -59,7 +62,7 @@
 			<div id="lunaBGLogo">
 			</div>
 			<div id="videoPlayerBox">
-				<video id="videoPlayer" src="" class="video-js vjs-default-skin">
+				<video id="videoPlayer" class="video-js vjs-default-skin">
 				</video>
 			</div>
 		</div>

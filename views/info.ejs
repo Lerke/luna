@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Luna</title>
+
+	<link rel="stylesheet" href="/css/lunastyle.css">
+	<link href='http://fonts.googleapis.c
+	om/css?family=Alegreya+Sans+SC:100' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/css/lunaMainPage.css">
+	<link rel="stylesheet" href="/css/infopage.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="/js/jquery.fittext.js"></script>
+	<script src="/js/generalPageRender.js"></script>
+
+</head>
+<body>
+	<div id="pageContainer">
+		<div id="lunaCredits">
+			<div id="lunaBGLogo">
+			</div>
+				<table id="infotable">
+				<tr>
+				<th>Luna</th>
+				</tr>
+					<tr>
+						<td>Luna Version</td>
+						<td><%= VERSION %></td>
+					</tr>
+
+					<tr>
+						<td>Uptime</td>
+						<td><%= u_days %> Days, <%= u_hours %> Hours, <%= u_min %> Minutes, <%= u_sec %> Seconds</td>
+					</tr>
+
+					<tr>
+						<td>Random Generation</td>
+						<td>[ <%= randomsample %> ]</td>
+					</tr>
+
+					<tr>
+					<th>Host</th>
+					</tr>
+					<tr>
+						<td>Host</td>
+						<td><%= osinfo.type() %></td>
+					</tr>
+
+					<tr>
+						<td>Host Platform</td>
+						<td><%= osinfo.platform() %></td>
+					<tr>
+
+					<tr>
+						<td>Host Uptime</td>
+						<td><%= Math.floor(osinfo.uptime()) %> Seconds</td>
+					</td>
+
+
+				</table>
+			
+		</div>
+	</div>
+</body>
+</html>

@@ -12,7 +12,8 @@ var SERVER = window.location.hostname + ':' + portnum;
 var currentPlayingVideoID;
 var isController = false;
 
-$(window).ready(function() {
+jQuery(document).ready(function() {
+jQuery.noConflict();
 		//Connect with the server
 		socket = io.connect("http://" + SERVER);
 		myRoom = rm;
@@ -28,7 +29,7 @@ $(window).ready(function() {
 			if(msg.result) {
 					//Yes, should show it.
 					isController = true;
-					$("#controlDiv").show();
+					jQuery("#controlDiv").show();
 				}
 			});
 
@@ -51,16 +52,23 @@ $(window).ready(function() {
   * @param {boolean} Whether or not the current video should start playing as soon as possible.
   */
   function initVideo(videoURL, videotime, startPlay) {
-  	videoURL = videoURL.replace("https", "http").replace("youtube", "youtube-nocookie");
+
+    if(videoURL.indexOf("youtube") >-1) {
+  	//videoURL = videoURL.replace("https", "http").replace("youtube", "youtube-nocookie");
+    var tOrder = "youtube";
+     } else if (videoURL.indexOf("soundcloud") > -1) {
+      var tOrder = "soundcloud";
+     }  
   	//Set videoPlayer options. Also disable that buggy spinner.
-  	videojs('videoPlayer', { "techOrder": ["youtube"],
-  		"src": videoURL,
-  		"controls": true,
-  		"autoplay": false,
-  		"preload": "auto",
-  		"width": 640,
-  		"height": 480,
-  		"children": {"loadingSpinner": false}}).ready(function() {
+  	videojs('videoPlayer', { 
+        techOrder: ["youtube"],
+        src: videoURL,
+  		controls: true,
+  		autoplay: false,
+  		preload: "auto",
+  		width: 640,
+  		height: 480,
+  		children: {"loadingSpinner": false}}).ready(function() {
 
   			video = this;
 
@@ -106,7 +114,7 @@ $(window).ready(function() {
 		});
 
 		socket.on('syncShuffle', function(msg) {
-			$("#shuffleBox").prop('checked', msg.shuffleState);
+			jQuery("#shuffleBox").prop('checked', msg.shuffleState);
 		});
 	}
 
@@ -115,50 +123,50 @@ $(window).ready(function() {
   * Such as: Button clicks, text inputs, etcetera.
   */
   function setUIElements() {
-  	$("#playbutton").on('click', function() {
-  		var selectedID = $("#playlistSelect").find("option:selected").data("songid");
+  	jQuery("#playbutton").on('click', function() {
+  		var selectedID = jQuery("#playlistSelect").find("option:selected").data("songid");
   		currentPlayingVideoID = selectedID;
   		sendSongRequest(selectedID);
   	});
 
-  	$("#removebutton").on('click', function() {
-  		var selectedID = $("#playlistSelect").find("option:selected").data("songid");
+  	jQuery("#removebutton").on('click', function() {
+  		var selectedID = jQuery("#playlistSelect").find("option:selected").data("songid");
   		if(selectedID == undefined) {
   			selectedID = currentPlayingVideoID
   		}
   		removeSongFromPlaylist(selectedID);
   	});
 
-  	$("#renamebutton").on('click', function() {
-  		var selectedID = $("#playlistSelect").find("option:selected").data("songid");
-  		var currentName = $("#playlistSelect").find("option:selected").text();
+  	jQuery("#renamebutton").on('click', function() {
+  		var selectedID = jQuery("#playlistSelect").find("option:selected").data("songid");
+  		var currentName = jQuery("#playlistSelect").find("option:selected").text();
   		renameSongFromPlaylist(selectedID, currentName);
   	});
 
-  	$("#urlInput").bind("enterKey", function(e) {
-  		socket.emit('addVideo', {url: $("#urlInput").val(), myroom: myRoom, controlkey: getControlHash()})
-  		$("#urlInput").val("");
+  	jQuery("#urlInput").bind("enterKey", function(e) {
+  		socket.emit('addVideo', {url: jQuery("#urlInput").val(), myroom: myRoom, controlkey: getControlHash()})
+  		jQuery("#urlInput").val("");
   	});
-  	$("#urlInput").keyup(function(e) {
+  	jQuery("#urlInput").keyup(function(e) {
   		if(e.keyCode == 13) {
-  			$(this).trigger("enterKey");
+  			jQuery(this).trigger("enterKey");
   		}
   	});
 
-  	$("#shuffleBox").click(function() {
-  		socket.emit('syncShuffle', {shuffleState: $(this).is(":checked")});
+  	jQuery("#shuffleBox").click(function() {
+  		socket.emit('syncShuffle', {shuffleState: jQuery(this).is(":checked")});
   	});
 
-  	$("#nextbutton").on('click', function() {
-  		if($("#shuffleBox").is(":checked")) {
+  	jQuery("#nextbutton").on('click', function() {
+  		if(jQuery("#shuffleBox").is(":checked")) {
   			sendShuffledSongRequest()
   		} else {
   			playNextVideo();
   		}
   	});
 
-  	$("#prevbutton").on('click', function() {
-  		if($("#shuffleBox").is(":checked")) {
+  	jQuery("#prevbutton").on('click', function() {
+  		if(jQuery("#shuffleBox").is(":checked")) {
   			sendShuffledSongRequest();
   		} else {
   			playPreviousVideo();
@@ -193,7 +201,7 @@ $(window).ready(function() {
 				throttle--;
 				if(throttle <= 0) {
 					socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.currentTime()), controlkey: getControlHash(), myroom: myRoom});
-					throttle = 10;
+					throttle = 5;
 				}
 			}
 		}
@@ -209,12 +217,12 @@ $(window).ready(function() {
 	video.on('ended', function() {
 		if(getControlHash() != null) {
 			//Check if shuffle is on.
-			if($("#shuffleBox").is(":checked")) {
+			if(jQuery("#shuffleBox").is(":checked")) {
 				//Shuffle it, baby.
 				sendShuffledSongRequest();
 			} else {
 				//error 404, Shuffle (fun) not found.
-				socket.emit('playNextVideo', {myroom: myRoom, controlkey: getControlHash(), currentID: currentPlayingVideoID });
+				playNextVideo();
 			}
 		}
 	});
@@ -258,14 +266,12 @@ $(window).ready(function() {
   */
   function updatePlaylist(playlist, newID) {
 	//Clear the playlist first!
-	$("#playlistSelect").find('option').remove().end();
+	jQuery("#playlistSelect").find('option').remove().end();
 
 	var playlistSelect = document.getElementById('playlistSelect');
 	if(newID == undefined || newID == null) {
 		newID = 0;
 	}
-	currentPlayingVideoID = newID;
-	$("#playlistSelect :nth-child(" + newID + ")").prop('selected', true);
 
 
 	for(var song in playlist) {
@@ -274,6 +280,10 @@ $(window).ready(function() {
 		option.setAttribute('data-songid', playlist[song].ID);
 		playlistSelect.appendChild(option);
 	}
+
+    currentPlayingVideoID = newID;
+  jQuery("#playlistSelect :nth-child(" + newID + ")").prop('selected', true);
+
 }
 
 /**
@@ -315,12 +325,12 @@ $(window).ready(function() {
  * @param {number} The ID of the video to be highlighted.
  */
  function highlightCurrentVideo(ID) {
- 	$("#playlistSelect > option").each(function() {
- 		$(this).css('background-color', 'transparent');
+ 	jQuery("#playlistSelect > option").each(function() {
+ 		jQuery(this).css('background-color', 'transparent');
  	})
- 	$("#playlistSelect > option").each(function() {
- 		if($(this).data("songid") == ID) {
- 			$(this).css('background-color', 'rgba(172,174,222,1)');
+ 	jQuery("#playlistSelect > option").each(function() {
+ 		if(jQuery(this).data("songid") == ID) {
+ 			jQuery(this).css('background-color', 'rgba(172,174,222,1)');
  		}
  	});
  }
@@ -337,4 +347,11 @@ $(window).ready(function() {
  */
  function playPreviousVideo() {
  	socket.emit('playPreviousVideo', {myroom: myRoom, controlkey: getControlHash(), currentID: currentPlayingVideoID });
+ }
+
+ function clientPlayVideoWithURL(url) {
+  if(url.indexOf("youtube") > -1) {
+    //It's a YT url.
+
+  }
  }

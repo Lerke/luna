@@ -1,3 +1,4 @@
 node_modules/
 streams/*.json
 !streams/teststream.json
+options.json

@@ -1,3 +1,5 @@
+var VERSIONID = '1.0.1';
+
 /*
  * Required modules.
  */
@@ -8,12 +10,27 @@
  var YTF = require('youtube-feeds');
  var colors = require('colors');
  var _ = require('underscore');
+ var SCR = require('soundcloud-resolve');
+
+ var startDate;
+
+ var lastrandom = [];
+
+ /* Important Variables. */
+
+ /* End important variables. */
 
 /**
  * Port number LUNA should listen on. Default is 9002.
  * @final
  */
- var portnum = 9002;
+ var portnum;
+
+/**
+ Read important variables.
+ */
+ initVariables();
+
 
 /**
  * Rooms object. Keep this in memory while the program runs to enhance performance. 
@@ -33,6 +50,7 @@
  * @final
  */
  var io = require('socket.io').listen(server);
+
 
 io.set('log level', 1); //Set log level minimal.
 
@@ -55,7 +73,23 @@ app.get('/', function(request, response) {
 
 //handler for the /credits link. Serves the credits page. -> ex. http://luna.berrypunch.net/credits
 app.get('/credits', function(request, response) {
-	response.render('credits.ejs');
+	response.render('credits.ejs', {VERSION: VERSIONID});
+});
+
+app.get('/info', function(request, response) {
+	var currTime = new Date();
+
+	var sec = Math.floor((currTime - (startDate))/1000);
+	var min = Math.floor(sec/60);
+	var hours = Math.floor(min/60);
+	var days = Math.floor(hours/24);
+	hours = hours-(days*24);
+
+	min = min-(days*24*60)-(hours*60);
+	sec = sec-(days*24*60*60)-(hours*60*60)-(min*60);
+	var os = require("os");
+
+	response.render('info.ejs', {u_days: days, u_hours: hours, u_min: min, u_sec: sec, VERSION: VERSIONID, randomsample: lastrandom, osinfo: os});
 });
 
 //Handler for /streams/ urls. -> ex. http://luna.berrypunch.net/streams/myStream
@@ -177,7 +211,6 @@ app.get('/streams/:stream', function(request, response) {
 							setRoomTime(userData.myroom, userData.currtime);
 							//Let other clients know the video has been seeked.
 							io.sockets.in(userData.myroom).emit('seekVideo', {time: userData.currtime});
-
 						}
 					});
 
@@ -230,7 +263,7 @@ app.get('/streams/:stream', function(request, response) {
 					 			playPreviousVideoInRoom(userData.myroom);
 					 		}
 					 	}
-					 })+
+					 });
 
 					 client.on('playNextShuffledVideo', function(userData) {
 					 	//Check if client has the correct stream key.
@@ -249,7 +282,15 @@ app.get('/streams/:stream', function(request, response) {
 						//Check if client has the correct stream key.
 						if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 							//Add the song to the user's room.
-							addYoutubeSong(userData.url, userData.myroom, client);
+
+							//Check if YouTube.
+							if(userData.url.indexOf("youtube.com") > -1) {
+								addYoutubeSong(userData.url, userData.myroom);
+							}
+							//Check SoundCloud.
+							if(userData.url.indexOf("soundcloud.com") > -1) {
+								addSoundcloudTrack(userData.url, userData.myroom);
+							}
 						}
 					});
 
@@ -392,12 +433,10 @@ logDebugMessage("Listening on port " + portnum + "...");
  {
 	var secretID=""; //The ID that will eventually get returned.
 	var characterset="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //The characterset.
-
 	while(secretID.length < 7) {
 		//Add a random character from the characterset to the secret ID.
 		secretID += characterset.charAt(Math.floor(Math.random() * characterset.length));
 	}
-
     return secretID; //Return the secret ID.
 }
 
@@ -463,7 +502,7 @@ Song.prototype.toString = function() {
 			//Let all clients know the current song has changed!
 			io.sockets.in(room).emit('changeVideo', {url: rooms[room].tracks[song].url, videoID: ID});
 			rooms[room].currentvideo = ID; //Update the in-memory state of the room. Will be saved to the disk soon!
-			increaseVideoNumPlayed(room, ID)
+			increaseVideoNumPlayed(room, ID);
 		}
 	}
 	saveStream(room); //Set the currentvideo to the ID of the song that is playing.
@@ -517,13 +556,13 @@ Song.prototype.toString = function() {
  * @param {socket.io client} The current client.
  * @return {boolean} false if the video can't be added due to it being an invalid url.
  */
- function addYoutubeSong(url, room, currClient) {
+ function addYoutubeSong(url, room) {
  	try {
-	url = url.split('v=')[1].split('&')[0]; //Get the correct url. We don't want any of that YT bullshit after the video ID.
-} catch(err) {
+		url = url.split('v=')[1].split('&')[0]; //Get the correct url. We don't want any of that YT bullshit after the video ID.
+	} catch(err) {
 	//This video is not valid.
 	return;
-}
+	}
 	YTF.video(url, function(err, data) { //Get video info for the current video ID.
 		if(err) {
 			return; //something went wrong. Just exit out.
@@ -553,6 +592,38 @@ Song.prototype.toString = function() {
 	//Sort playlist and set
 	sortPlaylist(room);
 });
+}
+
+function addSoundcloudTrack(url, room) {
+	SCR(soundCloudClientID, url, function(err, data) {
+		if(err) {
+			return;
+		} else {
+			var newTrack = {
+				"title": data.title,
+				"url": data.permalink_url,
+				"views": 0,
+				"id": rooms[room].nextID
+			}
+
+			//Check if track is legit.
+			if(newTrack.title == undefined || newTrack.url == undefined || newTrack.id == undefined) {
+				return false;
+			}
+
+			//Add new video object to current room.
+			rooms[room].tracks.push(newTrack);
+
+			//Increase the nextID of ths room.
+			rooms[room].nextID += 1;
+
+			//Save stream.
+			saveStream(room);
+
+			//Sort and redistribute.
+			sortPlaylist(room);
+		}
+	});
 }
 
  /**
@@ -663,6 +734,13 @@ Song.prototype.toString = function() {
  */
  function playNextVideoInRoomShuffle(room) {
  	var nextTrack = Math.floor(Math.random() * (rooms[room].tracks.length));
+
+ 	//Keep track of random generated values.
+ 	if(lastrandom.length == 25) {
+ 		lastrandom = _.last(lastrandom, lastrandom.length-1);
+ 	}
+ 	lastrandom.push(nextTrack);
+
  	var nextID = rooms[room].tracks[nextTrack].id;
  	playVideoInRoom(nextID, room);
  }
@@ -713,4 +791,12 @@ function sortPlaylist(room) {
 
 	//Notify clients!
 	sendClientsInRoomUpdatedPlaylist(room);
+}
+
+function initVariables() {
+	var optionVars = JSON.parse(fs.readFileSync('options.json'));
+	portnum = optionVars["port"];
+
+	//Set start date
+	startDate = new Date();
 }

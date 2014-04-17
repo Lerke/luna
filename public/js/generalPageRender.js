@@ -1,15 +1,17 @@
-$(window).ready(function() {
+
+jQuery(window).ready(function() {
+	jQuery.noConflict();
 	var isShown;
 	jQuery("#lunaText").fitText(0.235);
-	$("#lunaSidebar").hide("slide", {direction: "left"} , 1000);
+	jQuery("#lunaSidebar").hide("slide", {direction: "left"} , 1000);
 
-	$("body").on("mousemove", function(event) {
+	jQuery("body").on("mousemove", function(event) {
 		if(event.pageX < 200) {
 			//Show sidebar
-			$("#lunaSidebar").show("slide", {direction: "left"}, 500, function() {
+			jQuery("#lunaSidebar").show("slide", {direction: "left"}, 500, function() {
 			});
 		} else if(event.pageX >= 400) {
-			$("#lunaSidebar").hide("slide", {direction: "left" }, 500, function() {
+			jQuery("#lunaSidebar").hide("slide", {direction: "left" }, 500, function() {
 			});
 		}
 	});
