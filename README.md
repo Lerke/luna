@@ -12,7 +12,7 @@ Luna runs on top of node.js, a working install of node.js (Luna was developed wi
 
  1. Open your terminal and browse to Luna's root directory (where package.json resides).
  2. Type in `npm install` to install Luna's dependencies.
- 3. Luna needs to know which port it should run on. In order to do this, create a file called `package.json` in the root Luna directory. It should look something like this:
+ 3. Luna needs to know which port it should run on. In order to do this, create a file called `options.json` in the root Luna directory. It should look something like this:
  
         {
         "port": 9002    
