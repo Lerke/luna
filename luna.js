@@ -10,7 +10,7 @@ var VERSIONID = '1.0.1';
  var YTF = require('youtube-feeds');
  var colors = require('colors');
  var _ = require('underscore');
- var SCR = require('soundcloud-resolve');
+ //var SCR = require('soundcloud-resolve');
 
  var startDate;
 
@@ -288,9 +288,9 @@ app.get('/streams/:stream', function(request, response) {
 								addYoutubeSong(userData.url, userData.myroom);
 							}
 							//Check SoundCloud.
-							if(userData.url.indexOf("soundcloud.com") > -1) {
+							/*if(userData.url.indexOf("soundcloud.com") > -1) {
 								addSoundcloudTrack(userData.url, userData.myroom);
-							}
+							*/}
 						}
 					});
 
