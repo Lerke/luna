@@ -53,7 +53,7 @@ jQuery(document).ready(function() {
       bPlaying = data.playing;
       var params = { allowScriptAccess: "always" };
       var atts = { id: "ytplayer" };
-      swfobject.embedSWF("https://www.youtube.com/v/M7lc1UVf-VE?enablejsapi=1&fs=1&modestbranding=1&rel=0&autohide=1&version=3", "vbox", "640", "480", "9", null, null, params, atts);
+      swfobject.embedSWF("https://www.youtube.com/v/1Gf6jtbrBGA?enablejsapi=1&modestbranding=1&rel=0&autohide=1", "vbox", "640", "480", "9", null, null, params, atts);
 
     });
 	});		
@@ -187,6 +187,11 @@ function setSocketEvents() {
     switch(newState) {
       case 0: //video ended
       socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+    if(jQuery("#shuffleBox").is(":checked")) {
+        playNextVideo();
+      } else {
+        playPreviousVideo();
+      }
       break;
 
       case 1: //video playing
