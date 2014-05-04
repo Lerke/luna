@@ -283,7 +283,7 @@ jQuery(document).ready(function() {
 	}
 
   currentPlayingVideoID = newID;
-  jQuery("#playlistSelect :nth-child(" + newID + ")").prop('selected', true);
+  jQuery("#playlistSelect :nth-child(" + newID+1 + ")").prop('selected', true);
 
 }
 
