@@ -84,7 +84,7 @@
 }
 
 	function main() {
-		var streamsDirectory = __dirname+"\\streams";
+		var streamsDirectory = __dirname+"/streams";
 		console.log("\nReading streams in: " + streamsDirectory + "...\n");
 
 		var j = 0;
