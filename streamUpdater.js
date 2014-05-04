@@ -49,7 +49,7 @@ var sleep = require('sleep');
     var idCounter= 0
 
   	for(var track in stream.tracks) {
-      sleep.usleep(100000);
+      //sleep.usleep(100000);
   		YTF.video(stream.tracks[track].url.split('v=')[1].split('&')[0], function(err, data) {
   			if(err) {
           console.log(roomName + " / " + stream);
