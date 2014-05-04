@@ -14,6 +14,12 @@ var isController = false;
 
 jQuery(document).ready(function() {
   jQuery.noConflict();
+  jQuery("#lunaSidebar").resizable({
+    minWidth: 188,
+    maxWidth: 402,
+    minHeight: 100,
+    maxHeight: 100,
+  });
 		//Connect with the server
 		socket = io.connect("http://" + SERVER);
 		myRoom = rm;
