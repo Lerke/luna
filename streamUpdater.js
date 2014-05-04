@@ -46,6 +46,7 @@
   	var roomName = streamFile.substr(__dirname.length + "streams/".length +1).split('.json')[0];
   	var i = stream.tracks.length;
   	var j = 0;
+    var idCounter= 0
 
   	for(var track in stream.tracks) {
   		YTF.video(stream.tracks[track].url.split('v=')[1].split('&')[0], function(err, data) {
@@ -54,14 +55,12 @@
   				return;  			
   			}
   			ytvideo = data;
-
-  			var newTrack = new Track(ytvideo.title, ytvideo.player["default"].split('&')[0], stream.tracks[track].views, stream.tracks[track].id, ytvideo.duration);
-
+  			var newTrack = new Track(ytvideo.title, ytvideo.player["default"].split('&')[0], stream.tracks[track].views, idCounter++, ytvideo.duration);
   			newTracks.push(newTrack);
   			j++;
   			if(j == i) {
   				console.log("all tracks done here. Got : " + i + " / " + j);
-  				var newStream = new Stream(stream.streamTitle, stream.controlkey, stream.currentvideo, newTracks, stream.playing, 0, stream.nextID, false);
+  				var newStream = new Stream(stream.streamTitle, stream.controlkey, stream.currentvideo, newTracks, stream.playing, 0, idCounter, false);
   				console.log('writing...\n');
 
   						//stringify this object so that it can be written.
