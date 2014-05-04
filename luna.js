@@ -378,12 +378,8 @@ logDebugMessage("Listening on port " + portnum + "...");
 	rooms[currentRoom].currTime = time; //Set the time of the video.
 	saveStream(currentRoom); //Save it to the disk.
 
-	//TODO: CHECK IF I NEED TO SWAP VIDEO!
-	console.log(getCurrentVideoDuration(currentRoom));
-		console.log(rooms[currentRoom].currTime);
 
 	if(getCurrentVideoDuration(currentRoom) <= (rooms[currentRoom].currTime)) {
-		console.log("A new video should play.");
 		//Check if Shuffle is on for this room.
 		if(getRoomShuffleState(currentRoom)) {
 			//Play a shuffled video in this room.
@@ -621,9 +617,6 @@ Song.prototype.toString = function() {
 		if(err) {
 			return; //something went wrong. Just exit out.
 		}
-
-		console.log(data);
-		console.log(data.title + " : " + data.duration);
 
 	//Create song object.
 	var newSong = {

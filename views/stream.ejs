@@ -16,13 +16,7 @@
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-	
-
-	<!-- Note: LUNA includes these libraries, incase the original server goes down! -->
-	<script src="//vjs.zencdn.net/4.5.1/video.js"></script>
-	<link href="//vjs.zencdn.net/4.5.1/video-js.css" rel="stylesheet">
-	<script src="/js/vjs.youtube.js"></script>
-	<script src="/js/videojs.persistvolume.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 	<!-- LUNA sources. -->
 	<script src="/js/client.js"></script>
@@ -63,8 +57,9 @@
 			<div id="lunaBGLogo">
 			</div>
 			<div id="videoPlayerBox">
-				<video id="videoPlayer" class="video-js vjs-default-skin">
-				</video>
+			<div id="vbox"></div>
+			<!--	<div id="videoPlayer" class="video-js vjs-default-skin">
+				</div>-->
 			</div>
 		</div>
 	</div>

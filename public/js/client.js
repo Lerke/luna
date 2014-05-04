@@ -12,6 +12,8 @@ var SERVER = window.location.hostname + ':' + portnum;
 var currentPlayingVideoID;
 var isController = false;
 
+var bVid, bTime, bPlaying;
+
 jQuery(document).ready(function() {
   jQuery.noConflict();
   jQuery("#lunaSidebar").resizable({
@@ -46,8 +48,14 @@ jQuery(document).ready(function() {
 			var compensation = compensationt2 - compensationt1;
 			currentPlayingVideoID = data.currentID;
 			highlightCurrentVideo(currentPlayingVideoID);
-			initVideo(data.currVid, data.currTime + compensation, data.playing);
-		});
+      bVid = data.currVid;
+      bTime = data.currTime + compensation;
+      bPlaying = data.playing;
+      var params = { allowScriptAccess: "always" };
+      var atts = { id: "ytplayer" };
+      swfobject.embedSWF("https://www.youtube.com/v/M7lc1UVf-VE?enablejsapi=1&fs=1&modestbranding=1&rel=0&autohide=1&version=3", "vbox", "640", "480", "9", null, null, params, atts);
+
+    });
 	});		
 
  /** 
@@ -58,51 +66,41 @@ jQuery(document).ready(function() {
   * @param {boolean} Whether or not the current video should start playing as soon as possible.
   */
   function initVideo(videoURL, videotime, startPlay) {
+    video.addEventListener('onStateChange', 'onYTPlayerStateChange');
+    video.cueVideoById(videoURL.split('v=')[1]);
 
-    if(videoURL.indexOf("youtube") >-1) {
-  	//videoURL = videoURL.replace("https", "http").replace("youtube", "youtube-nocookie");
-    var tOrder = "youtube";
-  } else if (videoURL.indexOf("soundcloud") > -1) {
-    var tOrder = "soundcloud";
-  }  
-  	//Set videoPlayer options. Also disable that buggy spinner.
-  	videojs('videoPlayer', { 
-      techOrder: ["youtube"],
-      src: videoURL,
-      controls: true,
-      autoplay: false,
-      preload: "auto",
-      width: 640,
-      height: 480,
-      children: {"loadingSpinner": false}}).ready(function() {
+    video.seekTo(videotime);
+  //Check if video should autostart.
+  (!startPlay) ? pauseCurrentVideo() : playCurrentVideo();
 
-       video = this;
-       video.persistvolume({namespace: "Luna"}); //Remember the volume for next time!
+  setInterval(function() {
+   pingTimeUpdate();
+ },2000);
+}
 
-       this.currentTime(videotime);
+function onYouTubePlayerReady(id) {
+  video = document.getElementById("ytplayer");
+  initVideo(bVid, bTime, bPlaying)
+}
 
+function pingTimeUpdate() {
+  if(getControlHash() != null && video.getPlayerState() === 1) {
+    socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
 
-  		//Check if video should autostart.
-  		(!startPlay) ? video.pause() : video.play();
+  }
+}
 
-    	//Okay. lets set up all the video events.
-    	setVideoEvents();
-    });
-
-
-    }
-
-    function setSocketEvents() {
-      socket.on('changeStream', function(msg) {
-       switch(msg.data) {
-        case "play":
-        playCurrentVideo();
-        break;
-        case "pause":
-        pauseCurrentVideo();
-        break;
-      }
-    });
+function setSocketEvents() {
+  socket.on('changeStream', function(msg) {
+   switch(msg.data) {
+    case "play":
+    playCurrentVideo();
+    break;
+    case "pause":
+    pauseCurrentVideo();
+    break;
+  }
+});
 
 		//Playlist updated.
 		socket.on('playlistUpdate', function(msg) {
@@ -111,13 +109,17 @@ jQuery(document).ready(function() {
 		});
 
 		socket.on('seekVideo', function(msg) {
-			video.currentTime(msg.time);
-		});
+      if(msg.time + 3 < video.getCurrentTime() || msg.time -3 > video.getCurrentTime()) {
+       video.seekTo(msg.time);
+     }
+   });
 
 		socket.on('changeVideo', function(msg) {
 			currentPlayingVideoID = msg.videoID;
 			highlightCurrentVideo(currentPlayingVideoID);
-			video.src(msg.url);
+      video.loadVideoById(msg.url.split('v=')[1], 0, "large");
+      setTimeout(function(){video.playVideo()},1000);
+
     });
 
 		socket.on('syncShuffle', function(msg) {
@@ -181,59 +183,41 @@ jQuery(document).ready(function() {
   	});
   }
 
- /**
-  * Initialises the event handlers concerning the video element of the page.
-  * This handles HTML5 events like 'play', 'pause', 'timeupdate', 'durationchange', etc.
-  */
-  function setVideoEvents() {
-  	video.on('play', function() {
-  		videoIsPlaying = true;
-  		if(getControlHash() != null) {
-  			socket.emit('alterStream', {data: 'play', controlkey: getControlHash(), myroom: myRoom});
-  		}
-  	});
+  function onYTPlayerStateChange(newState) {
+    switch(newState) {
+      case 0: //video ended
+      socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+      break;
 
-	//Video is paused! Send message to pause other clients!
-	video.on('pause', function() {
-		videoIsPlaying = false;
-		if(getControlHash() != null) {
-			socket.emit('alterStream', {data: 'pause', controlkey: getControlHash(), myroom: myRoom});
-		}
-	});
-
-	//Video time changed. send to server.
-	video.on('timeupdate', function() {
-		if(getControlHash() != null) {
-			if(videoIsPlaying) {
-				throttle--;
-				if(throttle <= 0) {
-					socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.currentTime()), controlkey: getControlHash(), myroom: myRoom});
-					throttle = 5;
-				}
-			}
-		}
-	});
-
-	//Duration changed. Video must be seeked! (This is a work-around, since seeked/seeking events don't fire!)
-	video.on('durationchange', function() {
-		if(getControlHash() != null) {
-			socket.emit('seekVideo', {currtime: Math.ceil(video.currentTime()), controlkey: getControlHash(), myroom: myRoom});
-		}
-	});
-
-	video.on('ended', function() {
-		if(getControlHash() != null) {
-      socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.currentTime()), controlkey: getControlHash(), myroom: myRoom});
-		}
-	});
-}
+      case 1: //video playing
+      if(getControlHash() != null && !isPlaying) {
+       socket.emit('seekVideo', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+       socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+       socket.emit('alterStream', {data: 'play', controlkey: getControlHash(), myroom: myRoom});
+     } else if(getControlHash() != null && isPlaying) {
+      socket.emit('seekVideo', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+      socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+    }
+    break;
+      case 2: //video paused 
+      if(getControlHash() != null && isPlaying) {
+        socket.emit('seekVideo', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+        socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+        socket.emit('alterStream', {data: 'pause', controlkey: getControlHash(), myroom: myRoom});
+      } else if (getControlHash() != null && !isPlaying) {
+         socket.emit('seekVideo', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+        socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
+      }
+      break;
+    }
+  }
 
  /**
   * Plays the current video.
   */
   function playCurrentVideo() {
   	isPlaying = true;
-  	video.play();
+  	video.playVideo();
   }
 
  /**
@@ -241,7 +225,7 @@ jQuery(document).ready(function() {
   */
   function pauseCurrentVideo() {
   	isPlaying = false;
-  	video.pause();
+  	video.pauseVideo();
   }
 
  /**
@@ -257,7 +241,7 @@ jQuery(document).ready(function() {
   * @param {number} The seconds the video should seek to.
   */
   function changeTime(time) {
-  	video.currentTime(time);
+  	video.seekTo(time);
   }
 
  /**
@@ -333,7 +317,7 @@ jQuery(document).ready(function() {
  		}
  	});
   jQuery("#playlistSelect :nth-child(" + (currentPlayingVideoID+1) + ")").prop('selected', true);
- }
+}
 
 /**
  * Play the next video.
