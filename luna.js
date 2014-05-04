@@ -1,4 +1,4 @@
-var VERSIONID = '1.0.2';
+var VERSIONID = '1.1.0';
 
 /*
  * Required modules.
