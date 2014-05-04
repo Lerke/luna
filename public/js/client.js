@@ -118,7 +118,7 @@ jQuery(document).ready(function() {
 			currentPlayingVideoID = msg.videoID;
 			highlightCurrentVideo(currentPlayingVideoID);
 			video.src(msg.url);
-		});
+    });
 
 		socket.on('syncShuffle', function(msg) {
 			jQuery("#shuffleBox").prop('checked', msg.shuffleState);
@@ -161,7 +161,7 @@ jQuery(document).ready(function() {
   	});
 
   	jQuery("#shuffleBox").click(function() {
-  		socket.emit('syncShuffle', {shuffleState: jQuery(this).is(":checked")});
+  		socket.emit('syncShuffle', {shuffleState: jQuery(this).is(":checked"), myroom: myRoom});
   	});
 
   	jQuery("#nextbutton").on('click', function() {
@@ -223,14 +223,7 @@ jQuery(document).ready(function() {
 
 	video.on('ended', function() {
 		if(getControlHash() != null) {
-			//Check if shuffle is on.
-			if(jQuery("#shuffleBox").is(":checked")) {
-				//Shuffle it, baby.
-				sendShuffledSongRequest();
-			} else {
-				//error 404, Shuffle (fun) not found.
-				playNextVideo();
-			}
+      socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.currentTime()), controlkey: getControlHash(), myroom: myRoom});
 		}
 	});
 }

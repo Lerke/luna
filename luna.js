@@ -249,7 +249,7 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID == rooms[userData.myroom].currentvideo) {
+					 		if(userData.currentID === rooms[userData.myroom].currentvideo) {
 					 			playNextVideoInRoom(userData.myroom);
 					 		}
 					 	}
@@ -259,7 +259,7 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID == rooms[userData.myroom].currentvideo) {
+					 		if(userData.currentID === rooms[userData.myroom].currentvideo) {
 					 			playPreviousVideoInRoom(userData.myroom);
 					 		}
 					 	}
@@ -315,7 +315,11 @@ app.get('/streams/:stream', function(request, response) {
 					  });
 
 					  client.on('syncShuffle', function(userData) {
-					  	io.sockets.in(userData.myroom).emit('syncShuffle', {shuffleState: userData.shuffleState});
+					  	//Set shuffle on object.
+					  	setRoomShuffleState(userData.myroom, userData.shuffleState);
+					  	//Sync shuffle between clients
+					  	io.sockets.in(userData.myroom).emit('syncShuffle', {shuffleState: getRoomShuffleState(userData.myroom)});
+
 					  });
 
 					  client.on('shouldShowControlPanel', function(userData) {
@@ -337,6 +341,25 @@ logDebugMessage("Listening on port " + portnum + "...");
  }
 
 /**
+ * Set the shuffle state of this room.
+ * @param {string} The client's room.
+ * @param {boolean} Whether shuffle should be on or off.
+ */
+ function setRoomShuffleState(currentRoom, state) {
+ 	rooms[currentRoom].isShuffle = state;
+ 	saveStream(currentRoom);
+ }
+
+/**
+ * Get the shuffle state of this room.
+ * @param {string} The client's room.
+ * @return {boolean} Whether this room is on shuffle mode or not.
+ */
+ function getRoomShuffleState(room) {
+ 	return rooms[room].isShuffle;
+ }
+
+/**
  * Set the current video (in memory) to either playing or paused.
  * @param {string} The room in question.
  * @param {boolean} The state of the video. T = Playing, F = Paused.
@@ -354,6 +377,36 @@ logDebugMessage("Listening on port " + portnum + "...");
  function setRoomTime(currentRoom, time) {
 	rooms[currentRoom].currTime = time; //Set the time of the video.
 	saveStream(currentRoom); //Save it to the disk.
+
+	//TODO: CHECK IF I NEED TO SWAP VIDEO!
+	console.log(getCurrentVideoDuration(currentRoom));
+		console.log(rooms[currentRoom].currTime);
+
+	if(getCurrentVideoDuration(currentRoom) <= (rooms[currentRoom].currTime)) {
+		console.log("A new video should play.");
+		//Check if Shuffle is on for this room.
+		if(getRoomShuffleState(currentRoom)) {
+			//Play a shuffled video in this room.
+			playNextVideoInRoomShuffle(currentRoom);
+		} else {
+			//Play the next video in line.
+			playNextVideoInRoom(currentRoom);
+		}
+	}
+}
+
+function getCurrentVideoDuration(currentRoom) {
+	for(var song in rooms[currentRoom].tracks) { //Iterate over songs in this room's track array.
+		if(rooms[currentRoom].tracks[song].id == rooms[currentRoom].currentvideo) { //If ID's match, play this song!
+			//This is the song we want! Send URL!
+			//Let all clients know the current song has changed!
+			return rooms[currentRoom].tracks[song].duration;
+		}
+	}
+}
+
+function isShuffleEnabledForRoom(currentRoom) {
+	return rooms[currentRoom].isShuffle;
 }
 
 /**
@@ -384,6 +437,7 @@ logDebugMessage("Listening on port " + portnum + "...");
  	this.playing = false;
  	this.currTime = 0;
  	this.nextID = 0;
+ 	this.isShuffle = false;
  }
 
 /**
@@ -568,12 +622,16 @@ Song.prototype.toString = function() {
 			return; //something went wrong. Just exit out.
 		}
 
+		console.log(data);
+		console.log(data.title + " : " + data.duration);
+
 	//Create song object.
 	var newSong = {
 		"title": data.title,
 		"url": data.player["default"].split('&')[0],
 		"views": 0,
-		"id": rooms[room].nextID
+		"id": rooms[room].nextID,
+		"duration": data.duration
 	}
 
 	//Check if new song is legit.
