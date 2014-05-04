@@ -283,7 +283,6 @@ jQuery(document).ready(function() {
 	}
 
   currentPlayingVideoID = newID;
-  jQuery("#playlistSelect :nth-child(" + newID+1 + ")").prop('selected', true);
 
 }
 
@@ -334,6 +333,7 @@ jQuery(document).ready(function() {
  			jQuery(this).css('background-color', 'rgba(172,174,222,1)');
  		}
  	});
+  jQuery("#playlistSelect :nth-child(" + (currentPlayingVideoID+1) + ")").prop('selected', true);
  }
 
 /**
