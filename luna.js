@@ -379,7 +379,7 @@ logDebugMessage("Listening on port " + portnum + "...");
 	saveStream(currentRoom); //Save it to the disk.
 
 
-	if(getCurrentVideoDuration(currentRoom) <= (rooms[currentRoom].currTime)) {
+	if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +2)) {
 		//Check if Shuffle is on for this room.
 		if(getRoomShuffleState(currentRoom)) {
 			//Play a shuffled video in this room.
