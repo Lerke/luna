@@ -9,7 +9,7 @@
 
  var fs = require('fs');
  var YTF = require('youtube-feeds');
- var sync = require('sync');
+var sleep = require('sleep');
  var walker = require('node-walker');
 
  /**
