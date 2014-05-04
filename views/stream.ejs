@@ -68,4 +68,20 @@
 		</div>
 	</div>
 </body>
+<div id="dialog-modal" title="Chrome warning" style="display: none"><p>Luna and Chrome do not play well together at the moment. The Shuffle functionality will be disabled (Administrators only).</p></div>
+<script> //Check Chrome!
+var isChrome = !!window.chrome;
+if(isChrome) {
+	$("#shuffleBox").attr('disabled', true);
+	$("#shuffleBox").attr('checked', false);
+
+	$("#dialog-modal").dialog({
+		height: 340,
+		modal: true
+	});
+} else {
+		$("#shuffleBox").attr('disabled', false);
+
+}
+</script>
 </html>
