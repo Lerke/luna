@@ -51,6 +51,7 @@
   	for(var track in stream.tracks) {
   		YTF.video(stream.tracks[track].url.split('v=')[1].split('&')[0], function(err, data) {
   			if(err) {
+          console.log(roomName + " / " + stream);
   				console.log(err);
   				return;  			
   			}
