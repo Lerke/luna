@@ -13,7 +13,7 @@ var currentPlayingVideoID;
 var isController = false;
 
 jQuery(document).ready(function() {
-jQuery.noConflict();
+  jQuery.noConflict();
 		//Connect with the server
 		socket = io.connect("http://" + SERVER);
 		myRoom = rm;
@@ -56,23 +56,24 @@ jQuery.noConflict();
     if(videoURL.indexOf("youtube") >-1) {
   	//videoURL = videoURL.replace("https", "http").replace("youtube", "youtube-nocookie");
     var tOrder = "youtube";
-     } else if (videoURL.indexOf("soundcloud") > -1) {
-      var tOrder = "soundcloud";
-     }  
+  } else if (videoURL.indexOf("soundcloud") > -1) {
+    var tOrder = "soundcloud";
+  }  
   	//Set videoPlayer options. Also disable that buggy spinner.
   	videojs('videoPlayer', { 
-        techOrder: ["youtube"],
-        src: videoURL,
-  		controls: true,
-  		autoplay: false,
-  		preload: "auto",
-  		width: 640,
-  		height: 480,
-  		children: {"loadingSpinner": false}}).ready(function() {
+      techOrder: ["youtube"],
+      src: videoURL,
+      controls: true,
+      autoplay: false,
+      preload: "auto",
+      width: 640,
+      height: 480,
+      children: {"loadingSpinner": false}}).ready(function() {
 
-  			video = this;
+       video = this;
+       video.persistvolume({namespace: "Luna"}); //Remember the volume for next time!
 
-  			this.currentTime(videotime);
+       this.currentTime(videotime);
 
 
   		//Check if video should autostart.
@@ -83,19 +84,19 @@ jQuery.noConflict();
     });
 
 
-  	}
+    }
 
-  	function setSocketEvents() {
-  		socket.on('changeStream', function(msg) {
-  			switch(msg.data) {
-  				case "play":
-  				playCurrentVideo();
-  				break;
-  				case "pause":
-  				pauseCurrentVideo();
-  				break;
-  			}
-  		});
+    function setSocketEvents() {
+      socket.on('changeStream', function(msg) {
+       switch(msg.data) {
+        case "play":
+        playCurrentVideo();
+        break;
+        case "pause":
+        pauseCurrentVideo();
+        break;
+      }
+    });
 
 		//Playlist updated.
 		socket.on('playlistUpdate', function(msg) {
@@ -281,7 +282,7 @@ jQuery.noConflict();
 		playlistSelect.appendChild(option);
 	}
 
-    currentPlayingVideoID = newID;
+  currentPlayingVideoID = newID;
   jQuery("#playlistSelect :nth-child(" + newID + ")").prop('selected', true);
 
 }
@@ -354,4 +355,4 @@ jQuery.noConflict();
     //It's a YT url.
 
   }
- }
+}
