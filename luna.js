@@ -1,3 +1,4 @@
+"use strict";
 var VERSIONID = '1.1.0';
 
 /*
@@ -743,7 +744,13 @@ function addSoundcloudTrack(url, room) {
 		nextID++;
 	}
 	//We STILL found no matching ID's. Just set the video to the first video.
-	nextID = _.first(rooms[room].tracks).id
+	//TODO: TEMP FIX!
+	try {
+	nextID = _.first(rooms[room].tracks).id;
+	} catch(err) {
+		logDebugMessage("This video does not exist!");
+		return;
+	}
 	playVideoInRoom(nextID, room);
 }
 
