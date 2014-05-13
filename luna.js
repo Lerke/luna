@@ -782,7 +782,12 @@ function addSoundcloudTrack(url, room) {
 		nextID--;
 	}
 	//We STILL found no matching ID's. Just set the video to the last video.
-	nextID = _.last(rooms[room].tracks).id
+	try {
+	nextID = _.last(rooms[room].tracks).id;
+	} catch(err) {
+		logDebugMessage("This video does not exist!");
+		return;
+	}
 	playVideoInRoom(nextID, room);
 }
 
@@ -798,8 +803,12 @@ function addSoundcloudTrack(url, room) {
  		lastrandom = _.last(lastrandom, lastrandom.length-1);
  	}
  	lastrandom.push(nextTrack);
-
+ 	try {
  	var nextID = rooms[room].tracks[nextTrack].id;
+ 	} catch(err) {
+ 		logDebugMessage("This video does not exist!");
+ 		return;
+ 	}
  	playVideoInRoom(nextID, room);
  }
 
