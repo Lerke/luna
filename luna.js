@@ -629,7 +629,7 @@ Song.prototype.toString = function() {
 	}
 
 	//Check if new song is legit.
-	if(!newSong.title || newSong.url === undefined || newSong.url.length === 0 || newSong.id === undefined) {
+	if(!newSong.title || !newSong.url || (!newSong.id && newSong.id !== 0)) {
 		return false; // It aint cool!
 	}
 	//Add new Song object to the current room.
@@ -838,9 +838,9 @@ function sortPlaylist(room) {
 	//Sort the playlist!
 	tracks.sort(function(a,b) {
 		//Enforce that tracks are always strings.
-		var tA = (a === null) ? "" : "" + a;
-		var tB = (b === null) ? "" : "" + b;
-		return (tA.title.toLowerCase() < tB.title.toLowerCase()) ? -1 : ((tA.title.toLowerCase() > tB.title.toLowerCase()) ? 1 : 0);
+		var tA = a.title || '';
+		var tB = b.title || '';
+		return (tA.toLowerCase() < tB.toLowerCase()) ? -1 : ((tA.toLowerCase() > tB.toLowerCase()) ? 1 : 0);
 		
 	});
 
