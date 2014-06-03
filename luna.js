@@ -1,5 +1,5 @@
 "use strict";
-var VERSIONID = '1.1.0';
+var VERSIONID = '1.1.8';
 
 /*
  * Required modules.
@@ -320,8 +320,12 @@ app.get('/streams/:stream', function(request, response) {
 					  	setRoomShuffleState(userData.myroom, userData.shuffleState);
 					  	//Sync shuffle between clients
 					  	io.sockets.in(userData.myroom).emit('syncShuffle', {shuffleState: getRoomShuffleState(userData.myroom)});
-
 					  });
+
+					  client.on('sendChatMessage', function(userData) {
+					  		io.sockets.in(userData.myroom).emit('incomingChatMessage', {message: userData.message, nickname: userData.nickname});
+					  });
+
 
 					  client.on('shouldShowControlPanel', function(userData) {
 					  	client.emit('shouldShowControlPanel', {result: doesClientHaveStreamKey(userData.myroom, userData.controlkey)});

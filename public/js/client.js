@@ -1,3 +1,4 @@
+"use strict";
 var socket;
 var video;
 var videoIsPlaying = false;
@@ -14,10 +15,19 @@ var isController = false;
 
 var bVid, bTime, bPlaying;
 
+var myNickname;
+
 jQuery(document).ready(function() {
   jQuery.noConflict();
   jQuery("#lunaSidebar").resizable({
     minWidth: 188,
+    maxWidth: 402,
+    minHeight: 100,
+    maxHeight: 100,
+  });
+    jQuery("#chatBox").resizable({
+      handles:  'w,s',
+    minWidth: 215,
     maxWidth: 402,
     minHeight: 100,
     maxHeight: 100,
@@ -34,10 +44,11 @@ jQuery(document).ready(function() {
 
 		//Check if the client is a controller.
 		socket.on('shouldShowControlPanel', function(msg) {
+      jQuery("#controlDiv").show();
 			if(msg.result) {
 					//Yes, should show it.
 					isController = true;
-					jQuery("#controlDiv").show();
+					jQuery("#controllerOptions").show();
 				}
 			});
 
@@ -53,7 +64,7 @@ jQuery(document).ready(function() {
       bPlaying = data.playing;
       var params = { allowScriptAccess: "always" };
       var atts = { id: "ytplayer" };
-      swfobject.embedSWF("https://www.youtube.com/v/1Gf6jtbrBGA?enablejsapi=1&modestbranding=1&rel=0&autohide=1", "vbox", "640", "480", "9", null, null, params, atts);
+      swfobject.embedSWF("https://www.youtube.com/v/C0DPdy98e4c?enablejsapi=1&modestbranding=1&rel=0&autohide=1", "vbox", "640", "480", "9", null, null, params, atts);
 
     });
 	});		
@@ -122,6 +133,11 @@ function setSocketEvents() {
 
     });
 
+    socket.on('incomingChatMessage', function(msg) {
+      jQuery("#chatMessages").append("&lt;" + msg.nickname + "&gt; " + msg.message + "<br>");
+      jQuery("#chatMessages").scrollTop(jQuery("#chatMessages")[0].scrollHeight);
+    });
+
 		socket.on('syncShuffle', function(msg) {
 			jQuery("#shuffleBox").prop('checked', msg.shuffleState);
 		});
@@ -156,6 +172,7 @@ function setSocketEvents() {
   		socket.emit('addVideo', {url: jQuery("#urlInput").val(), myroom: myRoom, controlkey: getControlHash()})
   		jQuery("#urlInput").val("");
   	});
+
   	jQuery("#urlInput").keyup(function(e) {
   		if(e.keyCode == 13) {
   			jQuery(this).trigger("enterKey");
@@ -173,6 +190,23 @@ function setSocketEvents() {
   			playNextVideo();
   		}
   	});
+
+    jQuery("#nicknameInput").keypress(function(e) {
+      if(e.which === 13 && (jQuery("#nicknameInput").val().length > 0)) {
+       jQuery("#nicknameInput").unbind();
+       myNickname = jQuery("#nicknameInput").val();
+       jQuery("#chatNicknameBox").hide();
+       jQuery("#chatTextInputBox").show();
+      }
+    });
+
+      jQuery("#messageInput").keypress(function(e) {
+
+        if(e.which === 13 && jQuery("#messageInput").val().length > 0) {
+            socket.emit('sendChatMessage', {nickname: myNickname, myroom: myRoom, message: jQuery("#messageInput").val()});
+            jQuery("#messageInput").val("");
+          }
+     });
 
   	jQuery("#prevbutton").on('click', function() {
   		if(jQuery("#shuffleBox").is(":checked")) {

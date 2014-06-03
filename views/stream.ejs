@@ -35,9 +35,10 @@
 			<select multiple id="playlistSelect">
 			</select>
 			<div id="controlDiv">
+
+
+				<div id="controllerOptions">
 				<span id="controlspan">Control Panel</span><hr>
-
-
 				<input type="checkbox" name="shuffle" id="shuffleBox"><label for="shuffleBox">Shuffle</label><br>
 				<div id="nextPrevBox">
 					<button id="prevbutton"></button>
@@ -48,8 +49,22 @@
 				<button id="renamebutton" class="cdivButton">RENAME</button>
 				<div id="addVideoBox">
 					<span id="addVideoText">Add Video</span>
-					<input type="text" id="urlInput" placeholder="YT URL"/></div>
+					<input type="text" id="urlInput" placeholder="YT URL"/></div><br>
+				
 				</div>
+					<div id="publicOptions">
+				<span id="controlspan">Misc. Options</span><hr>
+					<div class="alignBox">
+				<table class="AlignList">
+				<tr><td><input type="checkbox" id="lockSidebar" name="lockBar" checked></td><td><label for="lockBar">Lock Sidebar</label></td></input></tr>
+				<tr><td><input type="checkbox" id="lockChatBar" name="lockChatBar" checked></td><td><label for="lockChatBar">Show Chat</label></td></input></tr>
+				</table>
+					</div>
+				</div>
+				</div>
+
+
+
 			</div>
 		</div>
 
@@ -58,10 +73,31 @@
 			</div>
 			<div id="videoPlayerBox">
 			<div id="vbox"></div>
-			<!--	<div id="videoPlayer" class="video-js vjs-default-skin">
-				</div>-->
 			</div>
 
+		</div>
+		<div id="chatBox" class="ui-widget-content'">
+			<div id="chatOptions">
+				<span id="controlspan">Chat</span><hr>
+			</div>
+			<div id="chatContentBox">
+			<div id="chatMessages">
+			</div>
+				<div id="chatNicknameBox">
+				<table id="chatNameTable">
+					<tr><td><label for="nickname">Nickname</label></td>
+					<td><input type="text" name="nickname" id="nicknameInput"></td>
+					</tr>
+					</table>
+				</div>
+				<div id="chatTextInputBox">
+					<table id="chatNameTable">
+					<tr><td><label for="nickname">Message</label></td>
+					<td><input type="text" name="message" id="messageInput"></td>
+					</tr>
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>
