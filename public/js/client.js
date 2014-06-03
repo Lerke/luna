@@ -141,11 +141,6 @@ function setSocketEvents() {
       message.append(nick);
       message.append(document.createTextNode(msg.message));
       jQuery("#chatMessages").append(message);
-      /*jQuery("#chatMessages").append("&lt;<strong>");
-      jQuery("#chatMessages").append(document.createTextNode(msg.nickname));
-      jQuery("#chatMessages").append("</strong>&gt; ");
-      jQuery("#chatMessages").append(document.createTextNode(msg.message));
-      jQuery("#chatMessages").append("<br>");*/
       jQuery("#chatMessages").scrollTop(jQuery("#chatMessages")[0].scrollHeight);
     });
 
