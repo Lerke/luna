@@ -134,7 +134,18 @@ function setSocketEvents() {
     });
 
     socket.on('incomingChatMessage', function(msg) {
-      jQuery("#chatMessages").append("&lt;" + msg.nickname + "&gt; " + msg.message + "<br>");
+
+      var message = jQuery("<div class=chatMessage></div>");
+      var nick = jQuery("<strong></strong>");
+      nick.append(document.createTextNode("<" + msg.nickname + "> "));
+      message.append(nick);
+      message.append(document.createTextNode(msg.message));
+      jQuery("#chatMessages").append(message);
+      /*jQuery("#chatMessages").append("&lt;<strong>");
+      jQuery("#chatMessages").append(document.createTextNode(msg.nickname));
+      jQuery("#chatMessages").append("</strong>&gt; ");
+      jQuery("#chatMessages").append(document.createTextNode(msg.message));
+      jQuery("#chatMessages").append("<br>");*/
       jQuery("#chatMessages").scrollTop(jQuery("#chatMessages")[0].scrollHeight);
     });
 
@@ -192,7 +203,7 @@ function setSocketEvents() {
   	});
 
     jQuery("#nicknameInput").keypress(function(e) {
-      if(e.which === 13 && (jQuery("#nicknameInput").val().length > 0)) {
+      if(e.which === 13 && (jQuery("#nicknameInput").val().length > 0) && (jQuery("#nicknameInput").val().length < 16)) {
        jQuery("#nicknameInput").unbind();
        myNickname = jQuery("#nicknameInput").val();
        jQuery("#chatNicknameBox").hide();
