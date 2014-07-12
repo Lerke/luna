@@ -83,6 +83,7 @@ jQuery(document).ready(function() {
       }
     });
     toggleToolTips(jQuery("#showToolTips").is(":checked"));
+    toggleFullScreen(jQuery("#fullScreen").is(":checked"));
 
 
 
@@ -234,11 +235,9 @@ function setSocketEvents() {
       var startTime = resolveEnteredTime(jQuery("#videoInputTimeBegin").val());
       var endTime = resolveEnteredTime(jQuery("#videoInputTimeEnd").val());
       if(startTime == 0) {
-        console.log("Null!");
         startTime = null;
       }
       if(endTime == 0) {
-        console.log("null");
         endTime = null;
       }
       if(startTime != null && endTime != null) {
@@ -633,7 +632,7 @@ function toggleFullScreen(fullscreen) {
     } else {
       widthAdjust = parseInt(jQuery("#chatBox").css("width").split("px")[0]);
     }
-    var totalWidth = parseInt(jQuery("#videoPlayerBox").css("width").split("px")[0]) - widthAdjust;
+    var totalWidth = parseInt(jQuery("#videoPlayerBox").css("width").split("px")[0]) - widthAdjust - leftAdjust;
     jQuery("#videoPlayerBox").css('width', totalWidth);
     jQuery("#videoPlayerBox").css('margin', 0);
     
