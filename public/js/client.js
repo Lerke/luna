@@ -83,7 +83,7 @@ jQuery(document).ready(function() {
       }
     });
     toggleToolTips(jQuery("#showToolTips").is(":checked"));
-    toggleFullScreen(jQuery("#fullScreen").is(":checked"));
+    
 
 
 
@@ -133,6 +133,7 @@ jQuery(document).ready(function() {
 function onYouTubePlayerReady(id) {
   video = document.getElementById("ytplayer");
   initVideo(bVid, bTime, bPlaying)
+  toggleFullScreen(jQuery("#fullScreen").is(":checked"));
 }
 
 function pingTimeUpdate() {
