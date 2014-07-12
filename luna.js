@@ -1,5 +1,5 @@
 "use strict";
-var VERSIONID = '1.1.81';
+var VERSIONID = '1.2';
 
 /*
  * Required modules.
@@ -17,10 +17,6 @@ var VERSIONID = '1.1.81';
 
  var lastrandom = [];
 
- /* Important Variables. */
-
- /* End important variables. */
-
 /**
  * Port number LUNA should listen on. Default is 9002.
  * @final
@@ -31,7 +27,6 @@ var VERSIONID = '1.1.81';
  Read important variables.
  */
  initVariables();
-
 
 /**
  * Rooms object. Keep this in memory while the program runs to enhance performance. 
@@ -77,6 +72,7 @@ app.get('/credits', function(request, response) {
 	response.render('credits.ejs', {VERSION: VERSIONID});
 });
 
+//handler for the /info link. Serves the info page. -> ex. http://luna.berrypunch.net/info
 app.get('/info', function(request, response) {
 	var currTime = new Date();
 
@@ -139,14 +135,20 @@ app.get('/streams/:stream', function(request, response) {
 							var streamDat = JSON.parse(data);
 							var vidnum = streamDat["currentvideo"];
 							var currentplaying = "";
-							for(var track in streamDat["tracks"]) {
-								if(streamDat["currentvideo"] == streamDat["tracks"][track]["id"]) {
-									currentplaying = streamDat["tracks"][track]["url"];
+							var isNumber = /^\d+/.test(streamDat["currentvideo"]);
+							if(isNumber) {
+								for(var track in streamDat["tracks"]) {
+									if(streamDat["currentvideo"] == streamDat["tracks"][track]["id"]) {
+										currentplaying = streamDat["tracks"][track]["url"];
+									}
 								}
+							} else {
+								currentplaying = streamDat["currentvideo"];
 							}
 							client.emit('initClient', {currVid: currentplaying,
 								currTime: rooms[userRoom].currTime,
 								playing: streamDat["playing"],
+								shuffleState: streamDat["isShuffle"],
 								currentID: rooms[userRoom].currentvideo });
 								//Send client latest playlist.
 								sendClientPlaylist(client, userRoom);
@@ -250,31 +252,37 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID === rooms[userData.myroom].currentvideo) {
-					 			playNextVideoInRoom(userData.myroom);
-					 		}
+					 		if(userData.currentID === rooms[userData.myroom].currentvideo || 
+					 			(isNaN(rooms[userData.myroom].currentvideo) && rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1)) {
+					 			rooms[userData.myroom].currentvideo = -1;
+					 		playNextVideoInRoom(userData.myroom, userData.currentID);
 					 	}
-					 });
+					 }
+					});
 
 					 client.on('playPreviousVideo', function(userData) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID === rooms[userData.myroom].currentvideo) {
-					 			playPreviousVideoInRoom(userData.myroom);
-					 		}
+					 		if(userData.currentID === rooms[userData.myroom].currentvideo || 
+					 			rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1) {
+					 			rooms[userData.myroom].currentvideo = -1;
+					 		playPreviousVideoInRoom(userData.myroom, userData.currentID);
 					 	}
-					 });
+					 }
+					});
 
 					 client.on('playNextShuffledVideo', function(userData) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 	//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 	if(userData.currentID == rooms[userData.myroom].currentvideo) {
-					 		playNextVideoInRoomShuffle(userData.myroom);
-					 	}
+					 	if(userData.currentID == rooms[userData.myroom].currentvideo || 
+					 		rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1) {
+					 		rooms[userData.myroom].currentvideo = -1;
+					 	playNextVideoInRoomShuffle(userData.myroom, userData.currentID);
 					 }
-					});
+					}
+				});
 
 					/*
 					 * Handle the 'addVideo' message from the client.
@@ -283,10 +291,9 @@ app.get('/streams/:stream', function(request, response) {
 						//Check if client has the correct stream key.
 						if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 							//Add the song to the user's room.
-
 							//Check if YouTube.
 							if(userData.url.indexOf("youtube.com") > -1) {
-								addYoutubeSong(userData.url, userData.myroom);
+								addYoutubeSong(userData.url, userData.myroom, userData.autoplay, userData.start, userData.end);
 							}
 							//Check SoundCloud.
 							/*if(userData.url.indexOf("soundcloud.com") > -1) {
@@ -294,6 +301,20 @@ app.get('/streams/:stream', function(request, response) {
 							}*/
 						}
 					});
+
+					 /*
+					  * Handle the 'playOneVideo' message from client.
+					  * Play only one video. Don't add it to the playlist.
+					  */
+					  client.on('playOneVideo', function(userData) {
+					  	//Check if client has the correct stream key.
+					  	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
+					  		//Send url to the room.
+					  		if(userData.url.indexOf("youtube.com") > -1) {
+					  			playVideoURLInRoom(userData.url, userData.myroom, userData.start);
+					  		}
+					  	}
+					  });
 
 					/*
 					 * Handle the 'removeVideo' message from the cient.
@@ -323,14 +344,43 @@ app.get('/streams/:stream', function(request, response) {
 					  });
 
 					  client.on('sendChatMessage', function(userData) {
-					  		io.sockets.in(userData.myroom).emit('incomingChatMessage', {message: userData.message, nickname: userData.nickname});
+					  	io.sockets.in(userData.myroom).emit('incomingChatMessage', {message: userData.message, nickname: userData.nickname});
+					  });
+
+					  client.on('sendErrorMessage', function(userData) {
+					  	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
+					  		var errorReason = "";
+					  		switch(userData.errorcode) {
+					  			case 2:
+					  			errorReason = "Invalid Video ID (E: 2)";
+					  			break;
+					  			case 100:
+					  			errorReason = "Video not found (E: 100)";
+					  			break;
+					  			case 101:
+					  			errorReason = "Embedding disabled for this video (E: 101)";
+					  			break;
+					  			case 150:
+					  			errorReason = "Embedding disabled for this video (E: 150)";
+					  			break;
+					  			default:
+					  			errorReason = "Unknown error";
+					  			break;
+					  		}
+					  		//Check if we can switch.
+					  		if(rooms[userData.myroom].currentvideo == userData.videoID) {
+					  			rooms[userData.myroom].currentvideo = -1;
+					  			playNextVideoInRoom(userData.myroom, userData.videoID);
+					  			io.sockets.in(userData.myroom).emit('incomingAdminChatMessage', {message: "Skipping: " + userData.title + " - " + errorReason});
+					  		}
+					  	}
 					  });
 
 
-					  client.on('shouldShowControlPanel', function(userData) {
-					  	client.emit('shouldShowControlPanel', {result: doesClientHaveStreamKey(userData.myroom, userData.controlkey)});
-					  });
-					});
+client.on('shouldShowControlPanel', function(userData) {
+	client.emit('shouldShowControlPanel', {result: doesClientHaveStreamKey(userData.myroom, userData.controlkey)});
+});
+});
 
 
 logDebugMessage("Listening on port " + portnum + "...");
@@ -380,11 +430,26 @@ logDebugMessage("Listening on port " + portnum + "...");
  * @param {number} The current time in seconds.
  */
  function setRoomTime(currentRoom, time) {
-	rooms[currentRoom].currTime = time; //Set the time of the video.
+ 	rooms[currentRoom].currTime = time; //Set the time of the video.
 	saveStream(currentRoom); //Save it to the disk.
-
-
-	if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +2)) {
+	if(rooms[currentRoom].hasOwnProperty("currentVideo") && isNaN(rooms[currentRoom].currentvideo) && (rooms[currentRoom].currentvideo.search(/youtube.com/i) > -1)) {
+		YTF.video(rooms[currentRoom].currentvideo.split('v=')[1].split('&')[0], function(err, data) { //Get video info for the current video ID.
+			if(err) {
+			return; //something went wrong. Just exit out.
+		}
+		if(data.duration <= ((rooms[currentRoom].currTime) +1)) {
+				//Check if Shuffle is on for this room.
+				if(getRoomShuffleState(currentRoom)) {
+					//Play a shuffled video in this room.
+					playNextVideoInRoomShuffle(currentRoom);
+				} else {
+					//Play the next video in line.
+					playNextVideoInRoom(currentRoom);
+				}
+			}
+		});
+	} else {
+		if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +1)) {
 		//Check if Shuffle is on for this room.
 		if(getRoomShuffleState(currentRoom)) {
 			//Play a shuffled video in this room.
@@ -395,13 +460,18 @@ logDebugMessage("Listening on port " + portnum + "...");
 		}
 	}
 }
+}
 
 function getCurrentVideoDuration(currentRoom) {
 	for(var song in rooms[currentRoom].tracks) { //Iterate over songs in this room's track array.
 		if(rooms[currentRoom].tracks[song].id == rooms[currentRoom].currentvideo) { //If ID's match, play this song!
 			//This is the song we want! Send URL!
 			//Let all clients know the current song has changed!
-			return rooms[currentRoom].tracks[song].duration;
+			if(rooms[currentRoom].tracks[song].hasOwnProperty("endTime")) {
+				return rooms[currentRoom].tracks[song].endTime;
+			} else {
+				return rooms[currentRoom].tracks[song].duration;
+			}
 		}
 	}
 }
@@ -555,13 +625,29 @@ Song.prototype.toString = function() {
 		if(rooms[room].tracks[song].id == ID) { //If ID's match, play this song!
 			//This is the song we want! Send URL!
 			//Let all clients know the current song has changed!
-			io.sockets.in(room).emit('changeVideo', {url: rooms[room].tracks[song].url, videoID: ID});
+			var startTime = 0;
+			var endTime = rooms[room].tracks[song].duration;
+			if(rooms[room].tracks[song].hasOwnProperty('startTime')) {
+				startTime = rooms[room].tracks[song].startTime;
+			}
+			if(rooms[room].tracks[song].hasOwnProperty('endTime')) {
+				endTime = rooms[room].tracks[song].endTime;
+			}
+			io.sockets.in(room).emit('changeVideo', {url: rooms[room].tracks[song].url, videoID: ID, start: startTime, end: endTime});
 			rooms[room].currentvideo = ID; //Update the in-memory state of the room. Will be saved to the disk soon!
 			increaseVideoNumPlayed(room, ID);
 		}
 	}
 	saveStream(room); //Set the currentvideo to the ID of the song that is playing.
 	sendClientsInRoomUpdatedPlaylist(room);
+}
+
+function playVideoURLInRoom(url, room, startTime) {
+	if(url.indexOf("youtube.com") > -1) {
+		io.sockets.in(room).emit('playVideoWithUrl', {url: url, start: startTime});
+		rooms[room].currentvideo = url; //Update the in-memory state of the room. Will be saved to the disk soon!
+		saveStream(room);
+	}
 }
 
 /**
@@ -608,18 +694,20 @@ Song.prototype.toString = function() {
  * Adds a new YT song to the current room's playlist.
  * @param {string} The URL of the YT video.
  * @param {string} The name of the room.
- * @param {socket.io client} The current client.
+ * @param {boolean} Whether or not the video should also be played.
  * @return {boolean} false if the video can't be added due to it being an invalid url.
  */
- function addYoutubeSong(url, room) {
+ function addYoutubeSong(url, room, shouldAutoPlay, startTime, endTime) {
  	try {
 		url = url.split('v=')[1].split('&')[0]; //Get the correct url. We don't want any of that YT bullshit after the video ID.
 	} catch(err) {
+		//Todo: let the client know.
 	//This video is not valid.
 	return;
-	}
+}
 	YTF.video(url, function(err, data) { //Get video info for the current video ID.
 		if(err) {
+			//Todo: let the client know.
 			return; //something went wrong. Just exit out.
 		}
 
@@ -630,6 +718,12 @@ Song.prototype.toString = function() {
 		"views": 0,
 		"id": rooms[room].nextID,
 		"duration": data.duration
+	}
+	if(startTime != null && startTime > 0) {
+		newSong.startTime = startTime;
+	}
+	if(endTime != null && endTime > 0) {
+		newSong.endTime = endTime;
 	}
 
 	//Check if new song is legit.
@@ -647,6 +741,10 @@ Song.prototype.toString = function() {
 
 	//Sort playlist and set
 	sortPlaylist(room);
+
+	if(shouldAutoPlay) {
+		playVideoInRoom(newSong.id, room);
+	}
 });
 }
 
@@ -725,9 +823,9 @@ function addSoundcloudTrack(url, room) {
   * The first video will play.
   * @param {string} The current room.
   */
-  function playNextVideoInRoom(room) {
+  function playNextVideoInRoom(room, currentID) {
 	//Get the next video ID of this room.
-	var nextID = rooms[room].currentvideo + 1;
+	var nextID = currentID + 1;
 	//Check if this ID is valid.
 	for(var vid in rooms[room].tracks) {
 		if(rooms[room].tracks[vid].id == nextID) {
@@ -750,7 +848,7 @@ function addSoundcloudTrack(url, room) {
 	//We STILL found no matching ID's. Just set the video to the first video.
 	//TODO: TEMP FIX!
 	try {
-	nextID = _.first(rooms[room].tracks).id;
+		nextID = _.first(rooms[room].tracks).id;
 	} catch(err) {
 		logDebugMessage("This video does not exist!");
 		return;
@@ -763,9 +861,9 @@ function addSoundcloudTrack(url, room) {
   * The last video will play.
   * @param {string} The current room.
   */
-  function playPreviousVideoInRoom(room) {
-	//Get the next video ID of this room.
-	var nextID = rooms[room].currentvideo - 1;
+  function playPreviousVideoInRoom(room, currentID) {
+	//Get the previous video ID of this room.
+	var nextID = currentID - 1;
 	//Check if this ID is valid.
 	for(var vid in rooms[room].tracks) {
 		if(rooms[room].tracks[vid].id == nextID) {
@@ -787,7 +885,7 @@ function addSoundcloudTrack(url, room) {
 	}
 	//We STILL found no matching ID's. Just set the video to the last video.
 	try {
-	nextID = _.last(rooms[room].tracks).id;
+		nextID = _.last(rooms[room].tracks).id;
 	} catch(err) {
 		logDebugMessage("This video does not exist!");
 		return;
@@ -799,8 +897,11 @@ function addSoundcloudTrack(url, room) {
  * Plays the next video. The video ID of the next video will be randomly generated.
  * @param {string} The current room.
  */
- function playNextVideoInRoomShuffle(room) {
- 	var nextTrack = Math.floor(Math.random() * (rooms[room].tracks.length));
+ function playNextVideoInRoomShuffle(room, currentID) {
+ 	var nextTrack;
+ 	do {
+ 		nextTrack = Math.floor(Math.random() * (rooms[room].tracks.length));
+ 	} while(currentID == nextTrack); //Prevent the same song from playing!
 
  	//Keep track of random generated values.
  	if(lastrandom.length == 25) {
@@ -808,7 +909,7 @@ function addSoundcloudTrack(url, room) {
  	}
  	lastrandom.push(nextTrack);
  	try {
- 	var nextID = rooms[room].tracks[nextTrack].id;
+ 		var nextID = rooms[room].tracks[nextTrack].id;
  	} catch(err) {
  		logDebugMessage("This video does not exist!");
  		return;

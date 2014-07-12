@@ -11,12 +11,15 @@
 	<link rel="stylesheet" href="/css/lunaMainPage.css">
 
 	<link rel="stylesheet" href="/css/lunaStream.css">
-	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.css" />
 
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/2.2.0/jquery.qtip.min.js"></script>
 
 	<!-- LUNA sources. -->
 	<script src="/js/client.js"></script>
@@ -28,77 +31,102 @@
 </head>
 <body>
 	<div id="pageContainer">
-		<div id="lunaSidebar" class="ui-widget-content'">
+		<div id="lunaSidebar">
+			
 			<span id="lunaText">LUNA</span>
 			<div id="lunaLogo">
+
 			</div>
-			<select multiple id="playlistSelect">
-			</select>
-			<div id="controlDiv">
-
-
-				<div id="controllerOptions">
-				<span id="controlspan">Control Panel</span><hr>
-				<input type="checkbox" name="shuffle" id="shuffleBox"><label for="shuffleBox">Shuffle</label><br>
-				<div id="nextPrevBox">
-					<button id="prevbutton"></button>
-					<button id="nextbutton"></button>
-				</div>
-				<button id="playbutton" class="cdivButton">PLAY</button>
-				<button id="removebutton" class="cdivButton">REMOVE</button>
-				<button id="renamebutton" class="cdivButton">RENAME</button>
-				<div id="addVideoBox">
-					<span id="addVideoText">Add Video</span>
-					<input type="text" id="urlInput" placeholder="YT URL"/></div><br>
-				
-				</div>
-					<div id="publicOptions">
-				<span id="controlspan">Misc. Options</span><hr>
-					<div class="alignBox">
-				<table class="AlignList">
-				<tr><td><input type="checkbox" id="lockSidebar" name="lockBar" checked></td><td><label for="lockBar">Lock Sidebar</label></td></input></tr>
-				<tr><td><input type="checkbox" id="lockChatBar" name="lockChatBar" checked></td><td><label for="lockChatBar">Show Chat</label></td></input></tr>
-				</table>
+			<div id="lunaSideBarContent">
+				<select multiple id="playlistSelect">
+				</select>
+				<div id="controlDiv">
+					<div id="controllerOptions">
+						<span id="controlspan">Control Panel</span><hr>
+						<input type="checkbox" name="shuffle" id="shuffleBox" class="glowbox" title="Check if you want the next/previous video to be a random video."><label for="shuffleBox" title="Check if you want the next/previous video to be a random video.">Shuffle</label><br>
+						<div id="nextPrevBox">
+							<button id="prevbutton"></button>
+							<button id="nextbutton"></button>
+						</div>
+						<button id="playbutton" class="cdivButton">PLAY</button>
+						<button id="removebutton" class="cdivButton">REMOVE</button>
+						<button id="renamebutton" class="cdivButton">RENAME</button>
+						<div id="addVideoBox">
+							<span id="addVideoText">Add Video</span>
+							<input type="text" id="urlInput" placeholder="YT URL" title="Enter the URL of the video you want to add to the playlist."/>
+							<div id="timeparentdiv" class="cf">
+								<div id="videoInputTimeBeginDiv">
+									<input type="text" id="videoInputTimeBegin" placeholder="Start Time" title="Begin time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty to set the time to 0s."/>
+								</div><div id="videoInputTimeEndDiv">
+								<input type="text" id="videoInputTimeEnd" placeholder="End Time" title="End time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty use the length of the video."/>
+							</div>
+						</div>
+					</div>
+					<input type="checkbox" id="playOnEnter" name="playOnEnter" unchecked class="glowbox" title="Check if you want newly added videos to instantly play."><label for="playOnEnter" title="Check if you want newly added videos to instantly play.">Autoplay</label>
+					<div id="oneTimeVideo">
+						<span id="addVideoText">Play Video Once</span>
+						<input type="text" id="onetimevideoinput" placeholder="VIDEO URL" title="Enter the URL of the video you want to play once without adding it to the playlist."/><br>
+						<div id="timeparentdiv" class="cf">
+							<div id="videoInputTimeBeginDiv">
+								<input type="text" id="videoInputTimeBeginOnce" placeholder="Start Time" title="Begin time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty to set the time to 0s."/>
+							</div><!--<div id="videoInputTimeEndDiv">
+							<input type="text" id="videoInputTimeEndOnce" placeholder="End Time" title="End time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty use the length of the video."/>
+						</div>-->
 					</div>
 				</div>
+			</div>
+			<div id="publicOptions">
+				<span id="controlspan">Misc. Options</span><hr>
+				<div class="alignBox">
+					<table class="AlignList">
+						<tr><td><input type="checkbox" id="fullScreen" name="fScreen" unchecked class="glowbox" title="Check to fullscreen videos."></td><td><label for="fullScreen" title="Check to fullscreen videos.">Fullscreen Video</label></td></input></tr>
+						<tr><td><input type="checkbox" id="lockSidebar" name="lockBar" checked class="glowbox" title="Check to lock this left sidepanel."></td><td><label for="lockSidebar" title="Check to lock this left sidepanel.">Lock Sidebar</label></td></input></tr>
+						<tr><td><input type="checkbox" id="lockChatBar" name="lockChatBar" checked class="glowbox" title="Check to show the right chatpanel."></td><td><label for="lockChatBar" title="Check to show the right chatpanel.">Show Chat</label></td></input></tr>
+						<tr><td><input type="checkbox" id="showToolTips" name="toolTips" unchecked class="glowbox" title="Check to show these popup tooltips."></td><td><label for="showToolTips" title="Check to show these popup tooltips." id="showToolTipsLabel">Show Tooltips</label></td></input></tr>
+					</table>
 				</div>
-
-
-
 			</div>
 		</div>
+	
+</div>
+</div>
 
-		<div id="lunaContent">
-			<div id="lunaBGLogo">
-			</div>
-			<div id="videoPlayerBox">
-			<div id="vbox"></div>
-			</div>
+<div id="lunaContent">
+	<div id="lunaBGLogo">
+	</div>
+	<div id="videoPlayerBox">
+		<div id="vbox"></div>
+	</div>
 
-		</div>
-		<div id="chatBox" class="ui-widget-content'">
-			<div id="chatOptions">
-				<span id="controlspan">Chat</span><hr>
-			</div>
-			<div id="chatContentBox">
+</div>
+</div>
+<div id="chatBox">
+	<div id="chatOptions">
+		<span id="controlspan">Chat</span><hr>
+	</div>
+	<div id="chatparent">
+		<div id="chatContentBox" >
 			<div id="chatMessages">
 			</div>
-				<div id="chatNicknameBox">
-				<table id="chatNameTable">
-					<tr><td><label for="nickname">Nickname</label></td>
+		</div>
+		<div id="chatNicknameBox">
+			<table id="chatNameTable">
+				<tr><td><label for="nickname">Nickname</label></td>
 					<td><input type="text" name="nickname" id="nicknameInput"></td>
-					</tr>
-					</table>
-				</div>
-				<div id="chatTextInputBox">
-					<table id="chatNameTable">
-					<tr><td><label for="nickname">Message</label></td>
+				</tr>
+			</table>
+		</div>
+		<div id="chatTextInputBox">
+			<table id="chatNameTable">
+				<tr><td><label for="nickname">Message</label></td>
 					<td><input type="text" name="message" id="messageInput"></td>
-					</tr>
-					</table>
-				</div>
-			</div>
+				</tr>
+			</table>
 		</div>
 	</div>
+
+</div>
+</div>
+</div>
 </body>
 </html>

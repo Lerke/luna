@@ -24,15 +24,17 @@ body {
 	box-shadow: inset 0px 0px 16px 0px rgba(0,0,0,0.75);
 	left:0;
 	top:0;
-	min-height: 100%;
+	min-height: 654px;
 	margin-top: 0;
-	overflow: hidden;
+	overflow-y: auto;
+	overflow-x: hidden;
 	bottom:0;
 	z-index: 100;
 }
 
 #lunaContent {
 	position: absolute;
+	overflow-y:hidden;
 	left: 188px;
 	top: 0;
 	bottom: 0;
@@ -149,4 +151,31 @@ body {
 	font-size: 1.3em;
 	background-color: rgba(255,255,255,0.3);
 	text-align: center;
+}
+
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+/**
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.cf {
+    *zoom: 1;
 }
