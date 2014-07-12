@@ -252,8 +252,8 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID === rooms[userData.myroom].currentvideo || 
-					 			(isNaN(rooms[userData.myroom].currentvideo) && rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1)) {
+					 		if(userData.currentID == rooms[userData.myroom].currentvideo || (typeof rooms[userData.myroom].currentvideo === 'string' &&
+					 		rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1)) {
 					 			rooms[userData.myroom].currentvideo = -1;
 					 		playNextVideoInRoom(userData.myroom, userData.currentID);
 					 	}
@@ -264,8 +264,8 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 		//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 		if(userData.currentID === rooms[userData.myroom].currentvideo || 
-					 			rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1) {
+					 		if(userData.currentID == rooms[userData.myroom].currentvideo || (typeof rooms[userData.myroom].currentvideo === 'string' &&
+					 		rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1)) {
 					 			rooms[userData.myroom].currentvideo = -1;
 					 		playPreviousVideoInRoom(userData.myroom, userData.currentID);
 					 	}
@@ -276,8 +276,8 @@ app.get('/streams/:stream', function(request, response) {
 					 	//Check if client has the correct stream key.
 					 	if(doesClientHaveStreamKey(userData.myroom, userData.controlkey)) {
 					 	//Only change if the ID's match. This is to prevent multiple calls to this method.
-					 	if(userData.currentID == rooms[userData.myroom].currentvideo || 
-					 		rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1) {
+					 	if(userData.currentID == rooms[userData.myroom].currentvideo || (typeof rooms[userData.myroom].currentvideo === 'string' &&
+					 		rooms[userData.myroom].currentvideo.toLowerCase().indexOf("youtube.com") > -1)) {
 					 		rooms[userData.myroom].currentvideo = -1;
 					 	playNextVideoInRoomShuffle(userData.myroom, userData.currentID);
 					 }
