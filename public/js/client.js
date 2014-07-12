@@ -401,7 +401,8 @@ function onYTPlayerStateChange(newState) {
 if(errorCode == 2 || errorCode == 100 || errorCode == 101 || errorCode == 150) {
   var errorID = currentPlayingVideoID;
   if(getControlHash() != null) {
-    jQuery.get("http://gdata.youtube.com/feeds/api/videos/" + video.getVideoUrl().split("v=")[1] + "?v=2&alt=json", function(data) {
+    var url = "https://gdata.youtube.com/feeds/api/videos/" + video.getVideoUrl().split("v=")[1] + "?v=2&alt=json";
+    jQuery.get(url, function(data) {
       var videoTitle = data.entry.title.$t || 'video not found!';
       jQuery("#playlistSelect > option").each(function() {
        if(jQuery(this).data("songid") == errorID) {
