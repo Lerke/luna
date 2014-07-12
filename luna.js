@@ -435,16 +435,17 @@ logDebugMessage("Listening on port " + portnum + "...");
 	if(rooms[currentRoom].hasOwnProperty("currentVideo") && isNaN(rooms[currentRoom].currentvideo) && (rooms[currentRoom].currentvideo.search(/youtube.com/i) > -1)) {
 		YTF.video(rooms[currentRoom].currentvideo.split('v=')[1].split('&')[0], function(err, data) { //Get video info for the current video ID.
 			if(err) {
+				logDebugMessage("Something went wrong getting info about a video.");
 			return; //something went wrong. Just exit out.
 		}
-		if(data.duration <= ((rooms[currentRoom].currTime) +1)) {
+		if(data.duration <= ((rooms[currentRoom].currTime) +2)) {
 				//Check if Shuffle is on for this room.
 				if(getRoomShuffleState(currentRoom)) {
 					//Play a shuffled video in this room.
-					playNextVideoInRoomShuffle(currentRoom);
+					playNextVideoInRoomShuffle(currentRoom,0);
 				} else {
 					//Play the next video in line.
-					playNextVideoInRoom(currentRoom);
+					playNextVideoInRoom(currentRoom,0);
 				}
 			}
 		});
@@ -453,10 +454,10 @@ logDebugMessage("Listening on port " + portnum + "...");
 		//Check if Shuffle is on for this room.
 		if(getRoomShuffleState(currentRoom)) {
 			//Play a shuffled video in this room.
-			playNextVideoInRoomShuffle(currentRoom);
+			playNextVideoInRoomShuffle(currentRoom, rooms[currentRoom].currentvideo);
 		} else {
 			//Play the next video in line.
-			playNextVideoInRoom(currentRoom);
+			playNextVideoInRoom(currentRoom, rooms[currentRoom].currentvideo);
 		}
 	}
 }
@@ -791,7 +792,7 @@ function addSoundcloudTrack(url, room) {
 	//Save stream!
 	saveStream(room);
 	//Play next video
-	playNextVideoInRoom(room);
+	playNextVideoInRoom(room, videoID+1);
 	//Sort playlist
 	sortPlaylist(room);
 }
@@ -824,6 +825,9 @@ function addSoundcloudTrack(url, room) {
   * @param {string} The current room.
   */
   function playNextVideoInRoom(room, currentID) {
+  	if(currentID == undefined || currentID == null) {
+  		currentID = 0;
+  	}
 	//Get the next video ID of this room.
 	var nextID = currentID + 1;
 	//Check if this ID is valid.
