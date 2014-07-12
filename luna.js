@@ -450,7 +450,7 @@ logDebugMessage("Listening on port " + portnum + "...");
 			}
 		});
 	} else {
-		if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +1)) {
+		if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +2)) {
 		//Check if Shuffle is on for this room.
 		if(getRoomShuffleState(currentRoom)) {
 			//Play a shuffled video in this room.
