@@ -1,5 +1,5 @@
 "use strict";
-var VERSIONID = '1.2';
+var VERSIONID = '1.2.1';
 
 /*
  * Required modules.
@@ -8,9 +8,10 @@ var VERSIONID = '1.2';
  var http = require('http');
  var fs = require('fs');
  var path = require('path');
- var YTF = require('youtube-feeds');
  var colors = require('colors');
+ var https = require("https");
  var _ = require('underscore');
+ var moment = require("moment");
  //var SCR = require('soundcloud-resolve');
 
  var startDate;
@@ -22,6 +23,7 @@ var VERSIONID = '1.2';
  * @final
  */
  var portnum;
+ var APIKEY;
 
 /**
  Read important variables.
@@ -433,12 +435,17 @@ logDebugMessage("Listening on port " + portnum + "...");
  	rooms[currentRoom].currTime = time; //Set the time of the video.
 	saveStream(currentRoom); //Save it to the disk.
 	if(rooms[currentRoom].hasOwnProperty("currentVideo") && isNaN(rooms[currentRoom].currentvideo) && (rooms[currentRoom].currentvideo.search(/youtube.com/i) > -1)) {
-		YTF.video(rooms[currentRoom].currentvideo.split('v=')[1].split('&')[0], function(err, data) { //Get video info for the current video ID.
-			if(err) {
-				logDebugMessage("Something went wrong getting info about a video.");
-			return; //something went wrong. Just exit out.
-		}
-		if(data.duration <= ((rooms[currentRoom].currTime) +2)) {
+		http.get("https://www.googleapis.com/youtube/v3/videos?id=" + APIKEY + "&part=snippet,contentDetails", function(res) {
+			var data = "";
+			res.on('data', function(e) {
+				data += e;
+			});
+			res.on('end', function(e) {
+				try {
+				var info = JSON.parse(data);
+				var duration = moment.duration(info["items"][0]["contentDetails"]["duration"], moment.ISO_8601).asSeconds();
+
+				if(duration <= ((rooms[currentRoom].currTime) + 2)) {
 				//Check if Shuffle is on for this room.
 				if(getRoomShuffleState(currentRoom)) {
 					//Play a shuffled video in this room.
@@ -448,6 +455,14 @@ logDebugMessage("Listening on port " + portnum + "...");
 					playNextVideoInRoom(currentRoom,0);
 				}
 			}
+		} catch(err) {
+			logDebugMessage("Could not connect to the Youtube API. Is your API key correct?");
+		}
+
+			});
+		}).on('error', function(e) {
+			logDebugMessage("Something went wrong getting info about a video.");
+			return;
 		});
 	} else {
 		if(getCurrentVideoDuration(currentRoom) <= ((rooms[currentRoom].currTime) +2)) {
@@ -706,47 +721,61 @@ function playVideoURLInRoom(url, room, startTime) {
 	//This video is not valid.
 	return;
 }
-	YTF.video(url, function(err, data) { //Get video info for the current video ID.
-		if(err) {
-			//Todo: let the client know.
-			return; //something went wrong. Just exit out.
+
+		https.get("https://www.googleapis.com/youtube/v3/videos?id=" + url + "&key=" + APIKEY + "&part=snippet,contentDetails", function(res) {
+
+			var data = "";
+
+			res.on('data', function(e) {
+				data += e;
+			});
+
+			res.on('end', function(e) {
+				try {
+			var info = JSON.parse(data);
+			var newSong = {
+				"title": info["items"][0]["snippet"]["title"],
+				"url": "http://www.youtube.com/watch?v=" + url,
+				"views": 0,
+				"id": rooms[room].nextID,
+				"duration": moment.duration(info["items"][0]["contentDetails"]["duration"], moment.ISO_8601).asSeconds()
+			}
+
+			if(startTime != null && startTime > 0) {
+				newSong.startTime = startTime;
+			}
+			if(endTime != null && endTime > 0) {
+				newSong.endTime = endTime;
+			}
+
+		//Check if new song is legit.
+		if(!newSong.title || !newSong.url || (!newSong.id && newSong.id !== 0)) {
+			return false; // It aint cool!
 		}
+		//Add new Song object to the current room.
+		rooms[room].tracks.push(newSong);
 
-	//Create song object.
-	var newSong = {
-		"title": data.title,
-		"url": data.player["default"].split('&')[0],
-		"views": 0,
-		"id": rooms[room].nextID,
-		"duration": data.duration
+		//Increase the nextID of this room.
+		rooms[room].nextID += 1;
+
+		//Save stream to disk (Async)
+		saveStream(room);
+
+		//Sort playlist and set
+		sortPlaylist(room);
+
+		if(shouldAutoPlay) {
+			playVideoInRoom(newSong.id, room);
+		}
+	} catch(err) {
+		logDebugMessage("Could not fetch video info. Is your API key correct?");
 	}
-	if(startTime != null && startTime > 0) {
-		newSong.startTime = startTime;
-	}
-	if(endTime != null && endTime > 0) {
-		newSong.endTime = endTime;
-	}
 
-	//Check if new song is legit.
-	if(!newSong.title || !newSong.url || (!newSong.id && newSong.id !== 0)) {
-		return false; // It aint cool!
-	}
-	//Add new Song object to the current room.
-	rooms[room].tracks.push(newSong);
-
-	//Increase the nextID of this room.
-	rooms[room].nextID += 1;
-
-	//Save stream to disk (Async)
-	saveStream(room);
-
-	//Sort playlist and set
-	sortPlaylist(room);
-
-	if(shouldAutoPlay) {
-		playVideoInRoom(newSong.id, room);
-	}
-});
+	});
+		}).on('error', function(e) {
+			logDebugMessage("Something went wrong getting info about a video.");
+			return;
+	});
 }
 
 function addSoundcloudTrack(url, room) {
@@ -976,6 +1005,7 @@ function sortPlaylist(room) {
 function initVariables() {
 	var optionVars = JSON.parse(fs.readFileSync('options.json'));
 	portnum = optionVars["port"];
+	APIKEY = optionVars["APIKEY"];
 
 	//Set start date
 	startDate = new Date();

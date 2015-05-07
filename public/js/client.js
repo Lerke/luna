@@ -527,7 +527,7 @@ function addMessageToBox(msg, messagetype) {
   * @param {string} The current name of the video.
   */
   function renameSongFromPlaylist(ID, currentName) {
-  	var newName = prompt("Enter a new title for this video.", currentName.split(" ")[1]);
+  	var newName = prompt("Enter a new title for this video.", currentName.split(/\s(.+)?/)[1]);
     if(newName != null) {
      socket.emit('renameVideo', {controlkey: getControlHash(), myroom: myRoom, currentID: ID, newname: newName});
    }

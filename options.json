@@ -1,3 +1,4 @@
 {
-	"port": 9002
+	"port": 9002,
+	"APIKEY": "enter_this_yourself"
 }
