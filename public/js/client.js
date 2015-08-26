@@ -23,6 +23,8 @@ var lastMessage = "";
 var lastNick = "";
 var lastAdminMessage = "";
 
+var currentfilter = "";
+
 jQuery(document).ready(function() {
   jQuery.noConflict();
   jQuery("#lunaSidebar").resizable({
@@ -293,6 +295,15 @@ jQuery("#videoInputTimeBegin").keyup(function(e) {
   }
 });
 
+jQuery("#filterInput").keyup(function() {
+  var newfilter = jQuery(this).val();
+  if(newfilter == currentfilter){
+    return;
+  }
+  currentfilter = newfilter;
+  filterPlaylist();
+});
+
 jQuery("#videoInputTimeEnd").keyup(function(e) {
   if(e.keyCode == 13) {
     jQuery("#urlinput").trigger("enterKey");
@@ -361,6 +372,17 @@ jQuery("#prevbutton").on('click', function() {
    playPreviousVideo();
  }
 });
+}
+
+function filterPlaylist() {
+  jQuery("#playlistSelect > option").each(function() {
+      var title = jQuery(this).val().substring(jQuery(this).val().indexOf(" "));
+      if((new RegExp(currentfilter, "i")).test(title)) {
+        jQuery(this).show();
+      } else {
+        jQuery(this).hide();
+      }
+  });
 }
 
 function onYTPlayerStateChange(newState) {
@@ -495,6 +517,7 @@ function addMessageToBox(msg, messagetype) {
 		playlistSelect.appendChild(option);
 	}
   currentPlayingVideoID = newID;
+  filterPlaylist();
 
 }
 

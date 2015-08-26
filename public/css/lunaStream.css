@@ -49,6 +49,23 @@
 	color: white;
 }
 
+#filterInput {
+	background-color: transparent;
+	border: 1px solid rgba(188,205,216,0.5);
+	width:95%;
+	color: #bccdd8;
+	border-radius: 10px;
+	text-align: center;
+	font-family: 'Open Sans', sans-serif;
+	transition: box-shadow .5s;
+}
+
+#filterInput:hover {
+		outline: none;
+	border-color: rgba(188,205,216,0.5);
+	box-shadow: 0 0 10px #ecf1f4;
+}
+
 #oneTimeVideo input {
 	background-color: transparent;
 	border: 1px solid rgba(188,205,216,0.5);
