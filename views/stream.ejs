@@ -41,7 +41,7 @@
 				<select multiple id="playlistSelect">
 				</select>
 				<div id="controlDiv">
-				<input type="text" id="filterInput" placeholder="Search playlist" title="Search the playlist"/>
+				<input type="text" id="filterInput" placeholder="Search playlist" title="Search the playlist by means of a regular expression."/>
 					<div id="controllerOptions">
 						<span id="controlspan">Control Panel</span><hr>
 						<input type="checkbox" name="shuffle" id="shuffleBox" class="glowbox" title="Check if you want the next/previous video to be a random video."><label for="shuffleBox" title="Check if you want the next/previous video to be a random video.">Shuffle</label><br>
@@ -70,9 +70,7 @@
 						<div id="timeparentdiv" class="cf">
 							<div id="videoInputTimeBeginDiv">
 								<input type="text" id="videoInputTimeBeginOnce" placeholder="Start Time" title="Begin time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty to set the time to 0s."/>
-							</div><!--<div id="videoInputTimeEndDiv">
-							<input type="text" id="videoInputTimeEndOnce" placeholder="End Time" title="End time of the video. Examples: 76s, 1m16s, 1h26m11s, 50. (Program assumes a time in seconds when only a numerical value is entered e.g.: 76s is the same as 76.) Leave empty use the length of the video."/>
-						</div>-->
+							</div>
 					</div>
 				</div>
 			</div>
@@ -95,8 +93,8 @@
 <div id="lunaContent">
 	<div id="lunaBGLogo">
 	</div>
-	<div id="videoPlayerBox">
-		<div id="vbox"></div>
+	 <div id="videoPlayerBox">
+	<div id="ytplayer" type="text/html" width="640" height="390" frameborder="0">
 	</div>
 
 </div>

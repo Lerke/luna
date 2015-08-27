@@ -440,3 +440,11 @@
 #lunaBGLogo {
 	left: -215px;
 }
+
+.ui-resizable-e {
+	right:1px !important;
+}
+
+.ui-resizable-w {
+	left: 1px !important;
+}

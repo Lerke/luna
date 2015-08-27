@@ -25,6 +25,13 @@ var lastAdminMessage = "";
 
 var currentfilter = "";
 
+  // Load the IFrame Player API code asynchronously.
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/player_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+
 jQuery(document).ready(function() {
   jQuery.noConflict();
   jQuery("#lunaSidebar").resizable({
@@ -33,6 +40,12 @@ jQuery(document).ready(function() {
     maxWidth: 402,
     minHeight: 100,
     maxHeight: 100,
+    start: function(event, ui) {
+      jQuery("#ytplayer").css('pointer-events', 'none');
+    },
+    stop: function(event, ui) {
+      jQuery("#ytplayer").css('pointer-events', 'auto');
+    },
     resize: function(event, ui) {
       lunaSidebarResizeEvent(event, ui);
     }
@@ -43,6 +56,12 @@ jQuery(document).ready(function() {
     maxWidth: 402,
     minHeight: 100,
     maxHeight: 100,
+    start: function(event, ui) {
+      jQuery("#ytplayer").css('pointer-events', 'none');
+    },
+    stop: function(event, ui) {
+      jQuery("#ytplayer").css('pointer-events', 'auto');
+    },
     resize: function(event, ui) {
       lunaChatbarResizeEvent(event, ui);
     }
@@ -105,9 +124,6 @@ jQuery(document).ready(function() {
     bPlaying = data.playing;
 
     jQuery("#shuffleBox").attr('checked', data.shuffleState);
-    var params = { allowScriptAccess: "always" };
-    var atts = { id: "ytplayer" };
-    swfobject.embedSWF("https://www.youtube.com/v/C0DPdy98e4c?enablejsapi=1&modestbranding=1&rel=0&autohide=1", "vbox", "640", "480", "9", null, null, params, atts);
   });
   });		
 
@@ -119,29 +135,47 @@ jQuery(document).ready(function() {
   * @param {boolean} Whether or not the current video should start playing as soon as possible.
   */
   function initVideo(videoURL, videotime, startPlay) {
-    video.addEventListener('onStateChange', 'onYTPlayerStateChange');
-    video.addEventListener('onError', 'onYTPlayerError');
-    video.cueVideoById(videoURL.split('v=')[1]);
-
+    if(videoURL != null) {
+    video.cueVideoById(videoURL.split('v=')[1]);;
+    if(videotime != null) { 
     video.seekTo(videotime);
+  }
   //Check if video should autostart.
+  if(startPlay != null) {
   (!startPlay) ? pauseCurrentVideo() : playCurrentVideo();
+}
+ }
 
   setInterval(function() {
    pingTimeUpdate();
  },2000);
 }
 
+function onYouTubePlayerAPIReady() {
+  video = new YT.Player('ytplayer', {
+      height: '390',
+      width: '640',
+      videoId: '',
+      playerVars: {
+        html5: 1
+      },
+      events: {
+        'onReady': onYouTubePlayerReady,
+        'onStateChange': onYTPlayerStateChange,
+        'onError': onYTPlayerError
+      }
+    });
+}
+
+//Todo: remove
 function onYouTubePlayerReady(id) {
-  video = document.getElementById("ytplayer");
-  initVideo(bVid, bTime, bPlaying)
-  toggleFullScreen(jQuery("#fullScreen").is(":checked"));
+ toggleFullScreen(jQuery("#fullScreen").is(":checked"));
+ initVideo(bVid, bTime, bPlaying)
 }
 
 function pingTimeUpdate() {
   if(getControlHash() != null && video.getPlayerState() === 1) {
     socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
-
   }
 }
 
@@ -235,8 +269,8 @@ function setSocketEvents() {
   	});
 
   	jQuery("#urlInput").bind("enterKey", function(e) {
-      var startTime = resolveEnteredTime(jQuery("#videoInputTimeBegin").val());
-      var endTime = resolveEnteredTime(jQuery("#videoInputTimeEnd").val());
+      var startTime = parseInt(resolveEnteredTime(jQuery("#videoInputTimeBegin").val()));
+      var endTime = parseInt(resolveEnteredTime(jQuery("#videoInputTimeEnd").val()));
       if(startTime == 0) {
         startTime = null;
       }
@@ -245,6 +279,8 @@ function setSocketEvents() {
       }
       if(startTime != null && endTime != null) {
         if(endTime <= startTime) {
+          console.log(endTime);
+          console.log(startTime);
           addMessageToBox("End time cannot occur before or at the start time.",2);
           return;
         }
@@ -312,7 +348,7 @@ jQuery("#videoInputTimeEnd").keyup(function(e) {
 
 jQuery("#onetimevideoinput").bind("enterKey", function(e) {
   var startTime = resolveEnteredTime(jQuery("#videoInputTimeBeginOnce").val());
-  if(startTime < 0) {
+  if(parseInt(startTime) < 0) {
     addMessageToBox("Starting time cannot be smaller than 0.", 2);
     return;
   }
@@ -386,7 +422,7 @@ function filterPlaylist() {
 }
 
 function onYTPlayerStateChange(newState) {
-  switch(newState) {
+  switch(newState.data) {
       case 0: //video ended
       socket.emit('altercurrentvideotime', {currtime: Math.ceil(video.getCurrentTime()), controlkey: getControlHash(), myroom: myRoom});
       break;
