@@ -1,5 +1,5 @@
 "use strict";
-var VERSIONID = '1.2.1';
+var VERSIONID = '1.3.0';
 
 /*
  * Required modules.
@@ -12,10 +12,8 @@ var VERSIONID = '1.2.1';
  var https = require("https");
  var _ = require('underscore');
  var moment = require("moment");
- //var SCR = require('soundcloud-resolve');
-
+ 
  var startDate;
-
  var lastrandom = [];
 
 /**
@@ -41,16 +39,13 @@ var VERSIONID = '1.2.1';
  * @final
  */
  var app = express();
- var server = http.createServer(app).listen(portnum);
+ var server = http.Server(app).listen(portnum);
 
 /**
  * The socket.io object.
  * @final
  */
- var io = require('socket.io').listen(server);
-
-
-io.set('log level', 1); //Set log level minimal.
+ var io = require('socket.io')(server);
 
 /*
  * Read streams before initializing the server.
@@ -104,7 +99,7 @@ app.get('/streams/:stream', function(request, response) {
 			fs.readFile(streamFile, 'utf8', function(err, data) {
 				//Read the file.
 				var streamDat = JSON.parse(data);
-				response.render('stream.ejs', {streamData: streamDat, roomName: request.params.stream});	
+				response.render('stream.ejs', {streamData: streamDat, roomName: request.params.stream, portNum: portnum});	
 			});
 		}
 	});
@@ -126,7 +121,7 @@ app.get('/streams/:stream', function(request, response) {
 					 client.on('setup', function(data) {
 					 	var userRoom = data.room;
 					 	logDebugMessage("A client registered on room: " + data.room);
-					 	client.set("room", data.room);
+					 	client.room = data.room;
 					 	if(rooms[data.room] == undefined) {
 					 		rooms[data.room] = data.room;
 					 	}
@@ -164,9 +159,7 @@ app.get('/streams/:stream', function(request, response) {
 					 * is currently in this room (and thus in the same socket.io room).
 					 */
 					 client.on('alterStream', function(msg) {
-					 	client.get("room", function(err, room) {
-							//check if client has the control link!
-							if(doesClientHaveStreamKey(msg.myroom, msg.controlkey)) {
+					 	if(doesClientHaveStreamKey(msg.myroom, msg.controlkey)) {
 								switch(msg.data) {
 									case "play":
 									setPlayPause(msg.myroom, true);
@@ -175,9 +168,8 @@ app.get('/streams/:stream', function(request, response) {
 									setPlayPause(msg.myroom, false);
 									break;
 								}
-								io.sockets.in(room).emit('changeStream', {data: msg.data});
-							}
-						});
+							io.sockets.in(client.room).emit('changeStream', {data: msg.data});
+						}	
 					 });
 
 					/*
@@ -185,10 +177,7 @@ app.get('/streams/:stream', function(request, response) {
 					 * Fired when a client disconnects.
 					 */
 					 client.on('disconnect', function() {
-					 	client.get("room", function(err, room) {
-							//Have the client leave his current socket.io room.
-							client.leave(room);
-						});
+					 	client.leave(client.room);
 					 });
 
 					/*
@@ -363,7 +352,7 @@ app.get('/streams/:stream', function(request, response) {
 					  			errorReason = "Embedding disabled for this video (E: 101)";
 					  			break;
 					  			case 150:
-					  			errorReason = "Embedding disabled for this video (E: 150)";
+					  			errorReason = "Embedding disabled for this video, or video was removed (E: 150)";
 					  			break;
 					  			default:
 					  			errorReason = "Unknown error";

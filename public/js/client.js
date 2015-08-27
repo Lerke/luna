@@ -7,26 +7,19 @@ var throttle = 1; //Alter this for more performance, but more accurate syncing!
 var compensationt1 = Math.round(new Date().getTime() / 1000);
 var compensationt2;
 var isPlaying;
-
-var portnum = 9002; //Port to listen on.
-var SERVER = window.location.hostname + ':' + portnum;
-
+var SERVER;
 var currentPlayingVideoID = 0;
 var isController = false;
-
 var bVid, bTime, bPlaying;
-
 var myNickname;
-
 var standaloneVideo = false;
 var lastMessage = "";
 var lastNick = "";
 var lastAdminMessage = "";
-
 var currentfilter = "";
 
 jQuery(document).ready(function() {
-  
+  SERVER = window.location.hostname + ':' + portnum;
     // Load the IFrame Player API code asynchronously.
   var tag = document.createElement('script');
   tag.src = "https://www.youtube.com/player_api";
@@ -451,23 +444,18 @@ function onYTPlayerStateChange(newState) {
     2 – The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.
 100 – The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.
 101 – The owner of the requested video does not allow it to be played in embedded players.
-150 – This error is the same as 101. It's just a 101 error in disguise!
+150 – This error is the same as 101. It's just a 101 error in disguise! Update: This can also mean the video was removed.
 */
-if(errorCode == 2 || errorCode == 100 || errorCode == 101 || errorCode == 150) {
   var errorID = currentPlayingVideoID;
   if(getControlHash() != null) {
     var url = "https://gdata.youtube.com/feeds/api/videos/" + video.getVideoUrl().split("v=")[1] + "?v=2&alt=json";
-    jQuery.get(url, function(data) {
-      var videoTitle = data.entry.title.$t || 'video not found!';
       jQuery("#playlistSelect > option").each(function() {
        if(jQuery(this).data("songid") == errorID) {
         errorID = jQuery(this).data("songid");
-        socket.emit('sendErrorMessage', {videoID: errorID, errorcode: errorCode, myroom: myRoom, controlkey: getControlHash(), title: jQuery(this).text().split(/\[\d+\]/)[1]});
+        socket.emit('sendErrorMessage', {videoID: errorID, errorcode: errorCode.data, myroom: myRoom, controlkey: getControlHash(), title: jQuery(this).text().split(/\[\d+\]/)[1]});
       }    
     });
-    });
   }
-}
 }
 
 //TODO: Convert all messages to this method
