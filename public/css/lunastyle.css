@@ -4,8 +4,17 @@ body {
 	height: 100%;
 	background-color: #070317;
 	overflow-x:hidden;
-
 }
+
+#sorry {
+	color: #bccdd8;
+	font-family: 'Open Sans', sans-serif;
+}
+
+#sorry a {
+	color: #bccdd8;
+}
+
 #pageContainer {
 	width: 100%;
 	height: 100%;
