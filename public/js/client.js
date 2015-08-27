@@ -167,7 +167,6 @@ function onYouTubePlayerAPIReady() {
     });
 }
 
-//Todo: remove
 function onYouTubePlayerReady(id) {
  toggleFullScreen(jQuery("#fullScreen").is(":checked"));
  initVideo(bVid, bTime, bPlaying)
@@ -279,8 +278,6 @@ function setSocketEvents() {
       }
       if(startTime != null && endTime != null) {
         if(endTime <= startTime) {
-          console.log(endTime);
-          console.log(startTime);
           addMessageToBox("End time cannot occur before or at the start time.",2);
           return;
         }
