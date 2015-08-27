@@ -12,11 +12,12 @@ Luna runs on top of node.js, a working install of node.js (Luna was developed wi
 
  1. Open your terminal and browse to Luna's root directory (where package.json resides).
  2. Type in `npm install` to install Luna's dependencies.
- 3. Luna needs to know which port it should run on and it needs a Youtube API key (Create one here: https://console.developers.google.com/project). In order to do this, create a file called `options.json` in the root Luna directory. It should look something like this:
+ 3. Luna needs to know which port it should run on and it needs 1 (or 2) Youtube API key (Create one here: https://console.developers.google.com/project). In order to do this, create a file called `options.json` in the root Luna directory. It should look something like this:
  
         {
         "port": 9002
-        "APIKEY": "your_api_key_here" 
+        "APIKEY": "your_api_key_here", (server key)
+        "CLIENTKEY": "your_api_key_here" (browser key)
         }
 
  4. Start Luna by typing `node luna.js` in your terminal. Luna should start automatically and display some text when everything went according to plan.

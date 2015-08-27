@@ -22,6 +22,7 @@ var VERSIONID = '1.3.0';
  */
  var portnum;
  var APIKEY;
+ var CLIENTKEY;
 
 /**
  Read important variables.
@@ -99,7 +100,7 @@ app.get('/streams/:stream', function(request, response) {
 			fs.readFile(streamFile, 'utf8', function(err, data) {
 				//Read the file.
 				var streamDat = JSON.parse(data);
-				response.render('stream.ejs', {streamData: streamDat, roomName: request.params.stream, portNum: portnum});	
+				response.render('stream.ejs', {streamData: streamDat, roomName: request.params.stream, portNum: portnum, clientkey: CLIENTKEY});	
 			});
 		}
 	});
@@ -995,6 +996,7 @@ function initVariables() {
 	var optionVars = JSON.parse(fs.readFileSync('options.json'));
 	portnum = optionVars["port"];
 	APIKEY = optionVars["APIKEY"];
+	CLIENTKEY = optionVars["CLIENTKEY"];
 
 	//Set start date
 	startDate = new Date();

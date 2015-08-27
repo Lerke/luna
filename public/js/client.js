@@ -342,7 +342,7 @@ jQuery("#onetimevideoinput").bind("enterKey", function(e) {
     addMessageToBox("Starting time cannot be smaller than 0.", 2);
     return;
   }
-  var url = "https://gdata.youtube.com/feeds/api/videos/" + jQuery("#onetimevideoinput").val().split("v=")[1] + "?v=2&alt=json";
+  var url = "https://www.googleapis.com/youtube/v3/videos?id=" + jQuery("#onetimevideoinput").val().split("v=")[1] + "&key=" + clientkey + "&part=snippet";
   jQuery.get(url, function(data) {
     socket.emit("playOneVideo", {url: jQuery("#onetimevideoinput").val(), myroom: myRoom, controlkey: getControlHash(), start: startTime});
     jQuery("#onetimevideoinput").val("");

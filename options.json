@@ -1,4 +1,5 @@
 {
 	"port": 9002,
-	"APIKEY": "enter_this_yourself"
+	"APIKEY": "your_key_here",
+	"CLIENTKEY": "your_key_here"
 }
