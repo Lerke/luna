@@ -590,7 +590,11 @@ function addMessageToBox(msg, messagetype) {
  			jQuery(this).css('background-color', 'rgba(172,174,222,1)');
  		}
  	});
-  jQuery("#playlistSelect :nth-child(" + (currentPlayingVideoID+1) + ")").prop('selected', true);
+    try {
+       jQuery("#playlistSelect :nth-child(" + (currentPlayingVideoID+1) + ")").prop('selected', true);
+    } catch (e) {
+    //Silent
+    }
 }
 
 /**
